@@ -253,10 +253,7 @@
             <div class="stat-label">Base Price</div>
             <div class="stat-value" id="basePriceText">—</div>
           </div>
-          <div class="stat-box">
-            <div class="stat-label">Rating</div>
-            <div class="stat-value" id="playerRatingText">—</div>
-          </div>
+
           <div class="stat-box">
             <div class="stat-label">Type</div>
             <div class="stat-value" id="playerTypeText" style="font-size:0.95rem;">—</div>
@@ -369,7 +366,7 @@
         <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI
       </button>
       <div id="aiResult" class="hidden" style="margin-top:16px;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;" id="aiScoreBar"></div>
+        <div id="aiScoreBar" class="ai-score-bar"></div>
         <div id="aiCommentary" style="font-size:0.9rem;color:var(--ink-dim);line-height:1.7;white-space:pre-wrap;background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);"></div>
       </div>
       <p id="aiMessage" class="message"></p>

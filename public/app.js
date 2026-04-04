@@ -130,7 +130,7 @@ const els = {
   playerMeta:       document.getElementById("playerMeta"),
   playerBadge:      document.getElementById("playerBadge"),
   basePriceText:    document.getElementById("basePriceText"),
-  playerRatingText: document.getElementById("playerRatingText"),
+
   playerTypeText:   document.getElementById("playerTypeText"),
   highestBidText:   document.getElementById("highestBidText"),
 
@@ -441,7 +441,7 @@ function renderLot() {
   }
 
   els.basePriceText.textContent = cr(lot.basePrice);
-  els.playerRatingText.textContent = lot.rating ? `${lot.rating} / 100` : "—";
+
   els.playerTypeText.innerHTML = lot.overseas
     ? `<span style="color:#a78bfa">✈️ Overseas</span>`
     : `<span style="color:#86efac">🇮🇳 Indian</span>`;
@@ -866,7 +866,7 @@ function renderPlaying11Selection() {
       <div>
         <div class="pill-name">${player.name}</div>
         <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">
-          Rating: ${player.rating} · ${cr(player.soldPrice)}
+          ${cr(player.soldPrice)}
         </div>
       </div>
       <div class="pill-meta">
