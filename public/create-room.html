@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Room - IPL Auction Arena</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'surface': '#0f1216',
+            'surface-container-low': '#15181b',
+            'surface-container': '#191c1f',
+            'surface-container-high': '#1f2225',
+            'surface-container-highest': '#2b2f33',
+            'outline-variant': '#49454f',
+            'primary': '#e1ab00',
+            'secondary': '#625b71',
+            'tertiary': '#7d5260',
+          },
+          fontFamily: {
+            'headline': ['Space Grotesk', 'sans-serif'],
+            'body': ['Manrope', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <style>
+    * { font-family: 'Manrope', sans-serif; }
+    .font-headline { font-family: 'Space Grotesk', sans-serif; }
+    html { background: #0f1216; color: #e1e2e7; }
+    body { background: #0f1216; }
+    
+    .btn-primary {
+      @apply relative px-6 py-3 bg-primary text-[#0f1216] font-headline font-bold text-base rounded-full overflow-hidden transition-all duration-300;
+    }
+    .btn-primary:hover:not(:disabled) {
+      @apply shadow-lg;
+      box-shadow: 0 0 20px rgba(225, 171, 0, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn-primary:disabled {
+      @apply opacity-50 cursor-not-allowed;
+    }
+
+    .room-card {
+      @apply bg-surface-container-high border border-outline-variant/20 rounded-xl p-6 cursor-pointer transition-all hover:border-primary/50 hover:shadow-lg;
+    }
+    .room-card.selected {
+      @apply border-primary bg-primary/10;
+    }
+
+    .team-grid {
+      @apply grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto;
+    }
+
+    .team-btn {
+      @apply p-3 rounded-lg border border-outline-variant/20 text-sm font-headline font-bold cursor-pointer transition-all hover:border-primary;
+    }
+    .team-btn.selected {
+      @apply border-primary bg-primary/20;
+    }
+  </style>
+</head>
+<body class="bg-surface text-white">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl">
+      
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-headline font-bold mb-2">
+          <span class="material-symbols-outlined align-text-bottom text-5xl text-primary">sports_kabaddi</span>
+          IPL Auction Arena
+        </h1>
+        <p class="text-slate-400">Create and manage your auction room</p>
+      </div>
+
+      <!-- Form -->
+      <form id="createRoomForm" class="space-y-8">
+        
+        <!-- Host Name -->
+        <div>
+          <label class="block text-sm font-headline font-bold text-primary mb-3 uppercase tracking-widest">
+            Your Name
+          </label>
+          <input 
+            id="hostNameInput" 
+            type="text" 
+            placeholder="Enter your name"
+            maxlength="30"
+            required
+            class="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary text-white placeholder-slate-500"
+          />
+        </div>
+
+        <!-- Room Type Selection -->
+        <div>
+          <label class="block text-sm font-headline font-bold text-primary mb-3 uppercase tracking-widest">
+            Room Type
+          </label>
+          <div class="space-y-3">
+            <!-- Host Room -->
+            <div id="hostRoomCard" class="room-card selected" onclick="selectRoomType('host')">
+              <div class="flex items-start gap-3 mb-2">
+                <input type="radio" name="roomType" value="host" checked class="mt-1" />
+                <div class="flex-1">
+                  <div class="font-headline font-bold text-lg mb-1">
+                    <span class="material-symbols-outlined align-text-bottom">admin_panel_settings</span>
+                    Host Room (Full Control)
+                  </div>
+                  <p class="text-sm text-slate-400">
+                    You get START, END, PAUSE buttons. Perfect for auction moderators.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Auto-Start Room -->
+            <div id="autoRoomCard" class="room-card" onclick="selectRoomType('auto')">
+              <div class="flex items-start gap-3 mb-2">
+                <input type="radio" name="roomType" value="auto" class="mt-1" />
+                <div class="flex-1">
+                  <div class="font-headline font-bold text-lg mb-1">
+                    <span class="material-symbols-outlined align-text-bottom">play_circle</span>
+                    Auto-Start Room (Bidding Only)
+                  </div>
+                  <p class="text-sm text-slate-400">
+                    Auction starts automatically. All players can bid with no host controls.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Selection -->
+        <div>
+          <label class="block text-sm font-headline font-bold text-primary mb-3 uppercase tracking-widest">
+            Choose Your Team (Optional)
+          </label>
+          <div class="team-grid" id="teamGrid"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full btn-primary py-3 text-lg">
+          <span class="material-symbols-outlined align-text-bottom mr-2">create</span>
+          Create Room
+        </button>
+
+        <!-- Back Button -->
+        <a href="/" class="block text-center text-slate-400 hover:text-primary transition-colors">
+          ← Back to Home
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const TEAMS = [
+      { id: "team-1", name: "CSK", full: "Chennai Super Kings" },
+      { id: "team-2", name: "MI", full: "Mumbai Indians" },
+      { id: "team-3", name: "RCB", full: "Royal Challengers Bengaluru" },
+      { id: "team-4", name: "KKR", full: "Kolkata Knight Riders" },
+      { id: "team-5", name: "RR", full: "Rajasthan Royals" },
+      { id: "team-6", name: "DC", full: "Delhi Capitals" },
+      { id: "team-7", name: "SRH", full: "Sunrisers Hyderabad" },
+      { id: "team-8", name: "PBKS", full: "Punjab Kings" },
+      { id: "team-9", name: "LSG", full: "Lucknow Super Giants" },
+      { id: "team-10", name: "GT", full: "Gujarat Titans" },
+    ];
+
+    let selectedTeamId = null;
+    let selectedRoomType = "host";
+
+    function renderTeams() {
+      const grid = document.getElementById("teamGrid");
+      grid.innerHTML = TEAMS.map(team => `
+        <button type="button" class="team-btn" onclick="selectTeam('${team.id}'); return false;">
+          <div>${team.name}</div>
+          <div class="text-xs text-slate-400">${team.full}</div>
+        </button>
+      `).join('');
+    }
+
+    function selectTeam(teamId) {
+      selectedTeamId = selectedTeamId === teamId ? null : teamId;
+      document.querySelectorAll('.team-btn').forEach(btn => btn.classList.remove('selected'));
+      if (selectedTeamId) {
+        document.querySelector(`button[onclick*="${selectedTeamId}"]`).classList.add('selected');
+      }
+    }
+
+    function selectRoomType(type) {
+      selectedRoomType = type;
+      document.getElementById('hostRoomCard').classList.toggle('selected', type === 'host');
+      document.getElementById('autoRoomCard').classList.toggle('selected', type === 'auto');
+      document.querySelector(`input[value="${type}"]`).checked = true;
+    }
+
+    document.getElementById('createRoomForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const hostName = document.getElementById('hostNameInput').value.trim();
+      if (!hostName) return;
+
+      const roomType = document.querySelector('input[name="roomType"]:checked').value;
+      const hostControls = roomType === 'host';
+
+      try {
+        const response = await fetch('/api/create-room', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            hostName,
+            preferredTeamId: selectedTeamId || null,
+            hostControls
+          })
+        });
+
+        const data = await response.json();
+        if (data.roomId) {
+          window.location.href = `/war-room?room=${data.roomId}`;
+        } else {
+          alert('Failed to create room: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Connection error');
+      }
+    });
+
+    renderTeams();
+  </script>
+</body>
+</html>

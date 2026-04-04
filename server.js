@@ -913,6 +913,55 @@ app.post("/api/analyze-rankings", async (req, res) => {
 });
 
 /* ══════════════════════════════════════════════════
+   CREATE ROOM ENDPOINT — REST API for room creation
+══════════════════════════════════════════════════ */
+app.post("/api/create-room", (req, res) => {
+  const { hostName, preferredTeamId, hostControls = true } = req.body;
+  if (!hostName || typeof hostName !== 'string') {
+    return res.status(400).json({ error: "hostName is required" });
+  }
+
+  let roomId = createRoomCode();
+  while (rooms.has(roomId)) roomId = createRoomCode();
+
+  const room = {
+    roomId,
+    status:         "lobby",
+    hostSocketId:   null,
+    hostName:       hostName.trim(),
+    hostControls:   Boolean(hostControls),
+    teams:          buildInitialTeams(),
+    players:        BASE_PLAYERS.map(p => ({ ...p })),
+    lotIndex:       0,
+    currentLot:     null,
+    currentBid:     null,
+    logs:           [],
+    participants:   {},
+    playing11Submissions: {},
+    rankings:       null,
+    timerDuration:  10,
+    timerLeft:      0,
+    timerInterval:  null,
+    isPaused:       false,
+    lastAuctionSignature: "",
+  };
+
+  let hostTeamId = null;
+  const chosenTeam = preferredTeamId
+    ? room.teams.find(t => t.id === preferredTeamId)
+    : room.teams[0];
+
+  if (chosenTeam) {
+    hostTeamId = chosenTeam.id;
+  }
+
+  rooms.set(roomId, room);
+  pushLog(room, `Room created by ${hostName} (hostControls: ${hostControls}). Waiting for connection…`);
+
+  res.json({ roomId, hostTeamId });
+});
+
+/* ══════════════════════════════════════════════════
    SHARE ENDPOINT — generates share URLs
 ══════════════════════════════════════════════════ */
 app.get("/api/share/:roomId", (req, res) => {
