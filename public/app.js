@@ -421,17 +421,19 @@ function renderLot() {
   const status = state.room?.status;
 
   if (!lot) {
-    els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${status === "ended" ? "🏆 Auction Complete!" : "⏳ Waiting for next player…"}`;
+    els.playerName.textContent = status === "ended" ? "Auction Complete!" : "Waiting for next player…";
     els.playerMeta.textContent = "";
     if (els.playerBadge) els.playerBadge.textContent = "";
     els.basePriceText.textContent = "—";
     els.playerRatingText.textContent = "—";
     els.playerTypeText.textContent = "—";
     els.highestBidText.innerHTML = "—";
+    const hbd = document.getElementById("highestBidDisplay");
+    if (hbd) hbd.textContent = "—";
     return;
   }
 
-  els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${lot.name}`;
+  els.playerName.textContent = lot.name;
   els.playerMeta.textContent = lot.team ? `Team: ${lot.team}` : "";
 
   const rc = roleClass(lot.role);
@@ -443,24 +445,23 @@ function renderLot() {
   els.basePriceText.textContent = cr(lot.basePrice);
   els.playerRatingText.textContent = lot.rating ? `${lot.rating} / 100` : "—";
   els.playerTypeText.innerHTML = lot.overseas
-    ? `<span style="color:#a78bfa">✈️ Overseas</span>`
+    ? `<span style="color:#c4b5fd">✈️ Overseas</span>`
     : `<span style="color:#86efac">🇮🇳 Indian</span>`;
 
   // Highest bid shown to all
+  const hbd = document.getElementById("highestBidDisplay");
   if (bid) {
     const cfg = teamConfig(bid.teamId);
-    els.highestBidText.innerHTML = `
-      <span style="color:${cfg.primary};font-weight:800;font-size:1.4rem;">${cr(bid.amount)}</span>
-      <span style="font-size:0.8rem;color:var(--muted);margin-left:8px;">
-        ${buildTeamLogoImg(cfg, "", 16, 'style="vertical-align:middle;margin-right:2px;border-radius:50%;background:#fff;padding:1px;"')} ${cfg.short} (${bid.ownerName})
-      </span>`;
-      
-    // Flash animation if we just got a new bid
+    const bidHtml = `<span style="color:${cfg.primary};font-weight:800;font-size:1.3rem;">${cr(bid.amount)}</span>
+      <span style="font-size:0.75rem;color:var(--muted);margin-left:8px;">${cfg.short} (${bid.ownerName})</span>`;
+    els.highestBidText.innerHTML = bidHtml;
+    if (hbd) hbd.innerHTML = `<span style="font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:#fff;">${cr(bid.amount)}</span> <span style="font-size:0.9rem;color:var(--muted);">${cfg.short}</span>`;
     els.highestBidText.classList.remove('bid-flash');
-    void els.highestBidText.offsetWidth; // trigger reflow
+    void els.highestBidText.offsetWidth;
     els.highestBidText.classList.add('bid-flash');
   } else {
     els.highestBidText.innerHTML = `<span style="color:var(--muted)">No bids yet — Base ${cr(lot.basePrice)}</span>`;
+    if (hbd) hbd.innerHTML = `<span style="font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--muted);">—</span>`;
   }
 }
 
@@ -747,54 +748,58 @@ function stopConfetti() {
 function renderTeams() {
   if (!state.room) return;
   const PURSE_START = 120;
+  const container = document.getElementById("teamsGrid");
+  if (!container) return;
 
-  els.teamsGrid.innerHTML = "";
-  state.room.teams.forEach(team => {
+  container.innerHTML = "";
+  state.room.teams.forEach((team, idx) => {
     const cfg = teamConfig(team.id);
     const spent = PURSE_START - team.purse;
     const pct = Math.max(0, Math.min(100, (team.purse / PURSE_START) * 100));
-    const overseasCount = team.squad.filter((p) => p.overseas).length;
+    const overseasCount = team.squad.filter(p => p.overseas).length;
+    const isMyTeam = team.id === state.teamId;
 
-    const card = document.createElement("article");
-    card.className = "squad-card";
-    card.innerHTML = `
-      <div class="squad-card-header">
-        ${buildTeamLogoImg(cfg, "squad-team-img", 44)}
-        <div class="squad-card-info">
-          <h3 style="color:${cfg.primary}">${cfg.short}</h3>
-          <p>${team.name}</p>
-          <p style="font-size:0.72rem;color:var(--muted)">${team.ownerName}</p>
+    const item = document.createElement("div");
+    item.className = "wr-team-item";
+    item.innerHTML = `
+      <input class="wr-team-toggle" type="radio" name="wr-team-acc" id="wr-team-${idx}" />
+      <label class="wr-team-label" for="wr-team-${idx}">
+        <div class="wr-team-label-left">
+          <div class="wr-team-icon">
+            ${buildTeamLogoImg(cfg, "", 22)}
+          </div>
+          <div>
+            <div class="wr-team-name" style="color:${isMyTeam ? cfg.primary : ''}">${cfg.short}</div>
+            <div class="wr-team-purse">${cr(team.purse)} left · ${team.squad.length} players</div>
+          </div>
         </div>
-        <div style="margin-left:auto;text-align:right;">
-          <div style="font-size:0.78rem;font-weight:700;color:${cfg.primary}">${cr(team.purse)}</div>
-          <div style="font-size:0.68rem;color:var(--muted)">remaining</div>
+        <span class="material-symbols-outlined wr-team-chevron">expand_more</span>
+      </label>
+      <div class="wr-team-players">
+        <div class="wr-team-players-inner custom-scrollbar">
+          <div class="wr-team-players-label">Squad · ✈️ ${overseasCount}/8 overseas · Spent ${cr(spent)}</div>
+          ${team.squad.length === 0
+            ? `<div class="wr-team-empty">No players yet</div>`
+            : team.squad.map(p => `
+              <div class="wr-team-player-row">
+                <span class="wr-team-player-name">${p.name}${p.overseas ? ' ✈️' : ''}</span>
+                <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">
+                  <span class="pill-role role-${roleClass(p.role)}">${roleShort(p.role)}</span>
+                  <span class="wr-team-player-price">${cr(p.soldPrice)}</span>
+                </div>
+              </div>`).join("")}
         </div>
-      </div>
-      <div class="purse-track" style="margin-bottom:10px;">
-        <div class="purse-fill" style="width:${pct}%;background:${cfg.primary}"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:10px;">
-        <span>Spent: <strong style="color:var(--ink-dim)">${cr(spent)}</strong></span>
-        <span>Squad: <strong style="color:var(--ink-dim)">${team.squad.length}</strong></span>
-        <span>✈️ <strong style="color:var(--ink-dim)">${overseasCount}/8</strong></span>
-      </div>
-      <div class="squad-player-list">
-        ${team.squad.length === 0
-          ? `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:8px 0">No players yet</div>`
-          : team.squad.map(p => `
-            <div class="squad-player-row">
-              <span class="squad-player-name">
-                ${p.name}${p.overseas ? ` <span class="overseas-flag">✈️</span>` : ""}
-              </span>
-              <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
-                <span class="pill-role role-${roleClass(p.role)}">${roleShort(p.role)}</span>
-                <span class="squad-player-price">${cr(p.soldPrice)}</span>
-              </div>
-            </div>`).join("")}
       </div>
     `;
-    els.teamsGrid.appendChild(card);
+    container.appendChild(item);
   });
+
+  // Update sidebar count
+  const countEl = document.getElementById("teamsLiveChip");
+  if (countEl) {
+    const active = state.room.teams.filter(t => t.ownerSocketId || t.ownerName !== "Vacant").length;
+    countEl.textContent = `${active}/10 PRESENT`;
+  }
 }
 
 function renderMarketWatch() {
@@ -804,27 +809,50 @@ function renderMarketWatch() {
   const unsold = state.room.unsoldPlayers || [];
   const upcoming = state.room.upcomingPlayers || [];
 
-  const renderEntries = (targetEl, entries, formatter) => {
-    if (!targetEl) return;
-    if (!entries.length) {
-      targetEl.innerHTML = `<div class="market-empty">No players yet</div>`;
-      return;
+  // Upcoming queue cards
+  const upcomingEl = document.getElementById("upcomingList");
+  if (upcomingEl) {
+    if (!upcoming.length) {
+      upcomingEl.innerHTML = `<div class="wr-queue-card"><div class="wr-queue-name" style="color:var(--muted)">No upcoming players</div></div>`;
+    } else {
+      upcomingEl.innerHTML = upcoming.slice(0, 8).map((p, i) => {
+        const roleKey = roleClass(p.role);
+        return `<div class="wr-queue-card" style="opacity:${Math.max(0.25, 1 - i * 0.12)}">
+          <div class="wr-queue-card-top">
+            <span class="wr-queue-role ${roleKey}">${roleShort(p.role)}</span>
+            <span class="wr-queue-bp">B.P. ${cr(p.basePrice)}</span>
+          </div>
+          <div class="wr-queue-name">${p.name}</div>
+          <div class="wr-queue-sub">${p.overseas ? '✈️ Overseas' : 'India'}</div>
+        </div>`;
+      }).join("");
     }
-    targetEl.innerHTML = entries.map(formatter).join("");
-  };
+  }
 
-  renderEntries(els.upcomingList, upcoming, (p) =>
-    `<div class="market-item"><span>${p.name}</span><span>${p.role} · ${cr(p.basePrice)}</span></div>`
-  );
+  // Sold list
+  const soldEl = document.getElementById("soldList");
+  if (soldEl) {
+    if (!sold.length) {
+      soldEl.innerHTML = `<div class="market-empty">None yet</div>`;
+    } else {
+      soldEl.innerHTML = sold.slice(-10).reverse().map(p => {
+        const team = state.room.teams.find(t => t.id === p.soldTo);
+        return `<div class="market-item"><span>${p.name}</span><span>${team ? team.name.split(' ').pop() : '-'} · ${cr(p.soldPrice)}</span></div>`;
+      }).join("");
+    }
+  }
 
-  renderEntries(els.soldList, sold, (p) => {
-    const team = state.room.teams.find((t) => t.id === p.soldTo);
-    return `<div class="market-item"><span>${p.name}</span><span>${team ? team.name : "-"} · ${cr(p.soldPrice)}</span></div>`;
-  });
-
-  renderEntries(els.unsoldList, unsold, (p) =>
-    `<div class="market-item"><span>${p.name}</span><span>${p.role} · ${cr(p.basePrice)}</span></div>`
-  );
+  // Unsold list
+  const unsoldEl = document.getElementById("unsoldList");
+  if (unsoldEl) {
+    if (!unsold.length) {
+      unsoldEl.innerHTML = `<div class="market-empty">None yet</div>`;
+    } else {
+      unsoldEl.innerHTML = unsold.slice(-10).reverse().map(p =>
+        `<div class="market-item"><span>${p.name}</span><span>${p.role}</span></div>`
+      ).join("");
+    }
+  }
 }
 
 function renderPlaying11Selection() {
@@ -1020,15 +1048,16 @@ function roleText() {
 ══════════════════════════════════════════════════ */
 function render() {
   const ready = Boolean(state.room);
-  
-  // Hide join + team selector + features once in a room
+
+  // Switch between landing page and war room
+  const landingPage = document.getElementById("landingPage");
+  const warRoom = document.getElementById("warRoom");
+  if (landingPage) landingPage.classList.toggle("hidden", ready);
+  if (warRoom) warRoom.classList.toggle("hidden", !ready);
+
+  // Keep legacy hidden elements in sync (app.js logic depends on these)
   els.joinCard.classList.toggle("hidden", ready);
   els.teamSelectCard.classList.toggle("hidden", ready);
-  const featuresCard = document.getElementById("featuresCard");
-  if (featuresCard) featuresCard.classList.toggle("hidden", ready);
-  const heroBanner = document.querySelector(".hero-banner");
-  if (heroBanner) heroBanner.classList.toggle("hidden", ready);
-  
   els.roomCard.classList.toggle("hidden", !ready);
   els.auctionCard.classList.toggle("hidden", !ready);
   els.teamsCard.classList.toggle("hidden", !ready);
@@ -1048,8 +1077,8 @@ function render() {
   els.hostControls.classList.toggle("hidden", state.role !== "host");
   if (els.pauseAuctionBtn) {
     els.pauseAuctionBtn.innerHTML = state.room.isPaused
-      ? `<i class="fa-solid fa-play"></i> Resume Auction`
-      : `<i class="fa-solid fa-pause"></i> Pause Auction`;
+      ? `<span class="material-symbols-outlined" style="font-size:1rem;">play_arrow</span> RESUME`
+      : `<span class="material-symbols-outlined" style="font-size:1rem;">pause</span> PAUSE`;
     els.pauseAuctionBtn.disabled = state.room.status !== "live";
   }
   if (els.endAuctionBtn) {
@@ -1065,6 +1094,10 @@ function render() {
   // Bid card: visible when live. Both team-owners AND host-with-team can bid.
   const hasTeam = Boolean(state.teamId);
   els.bidCard.classList.toggle("hidden", !isLive);
+
+  // Toggle waiting panel
+  const waitingPanel = document.getElementById("waitingPanel");
+  if (waitingPanel) waitingPanel.classList.toggle("hidden", isLive);
 
   if (isLive) {
     const canBid = hasTeam && state.room.currentLot && !state.room.isPaused;
@@ -1445,7 +1478,7 @@ socket.on("room_state", roomState => {
   state.room = roomState;
   // Reset skip button label when lot changes
   if (els.skipPlayerBtn && roomState.currentLot?.id !== prevLotId) {
-    els.skipPlayerBtn.innerHTML = `<i class="fa-solid fa-forward-step"></i> Skip`;
+    els.skipPlayerBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size:1rem;">skip_next</span> SKIP`;
   }
   if (els.timerSelect && Number.isFinite(Number(roomState.timerDuration))) {
     els.timerSelect.value = String(roomState.timerDuration);
@@ -1460,7 +1493,7 @@ socket.on("connect_error", () => {
 
 socket.on("skip_vote_update", ({ votes, needed }) => {
   if (els.skipPlayerBtn) {
-    els.skipPlayerBtn.innerHTML = `<i class="fa-solid fa-forward-step"></i> Skip (${votes}/${needed})`;
+    els.skipPlayerBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size:1rem;">skip_next</span> SKIP (${votes}/${needed})`;
   }
 });
 
@@ -1489,19 +1522,6 @@ socket.on("connect", () => {
    INIT
 ══════════════════════════════════════════════════ */
 buildTeamSelector();
-
-// Toggle teams grid visibility
-const toggleTeamsBtn = document.getElementById("toggleTeamsBtn");
-const toggleTeamsIcon = document.getElementById("toggleTeamsIcon");
-if (toggleTeamsBtn) {
-  toggleTeamsBtn.addEventListener("click", () => {
-    const grid = document.getElementById("teamsGrid");
-    const hidden = grid.style.display === "none";
-    grid.style.display = hidden ? "" : "none";
-    toggleTeamsIcon.className = hidden ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
-    toggleTeamsBtn.innerHTML = `<i class="${toggleTeamsIcon.className}" id="toggleTeamsIcon"></i> ${hidden ? "Hide" : "Show"}`;
-  });
-}
 
 // Tab switching for New Game / Join Room
 const tabNew = document.getElementById("tabNew");
