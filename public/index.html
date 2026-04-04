@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IPL Auction Arena — Live 10-Team Bidding</title>
+  <title>IPL Auction Arena</title>
   <meta name="description" content="IPL Auction Arena: A live 10-team auction with 254 players, Playing XI intelligence, and transparent rankings." />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -13,11 +13,9 @@
 </head>
 
 <body>
-  <!-- Animated background shapes -->
   <div class="bg-shape bg-shape-1"></div>
   <div class="bg-shape bg-shape-2"></div>
 
-  <!-- ══════ SOLD / UNSOLD OVERLAY ══════ -->
   <div id="lotResultOverlay" class="lot-result-overlay hidden">
     <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
     <div class="lot-result-content">
@@ -34,7 +32,6 @@
 
   <main class="container">
 
-    <!-- ══════ HERO BANNER ══════ -->
     <header class="hero-banner">
       <div class="hero-inner">
         <div class="hero-badge">🏏 LIVE AUCTION PLATFORM</div>
@@ -44,11 +41,9 @@
         <p class="muted-text" style="margin-top:10px; font-size:1rem;">
           10 teams · 254 players · Real-time bidding · Playing XI intelligence
         </p>
-        <p class="hero-credit">Created by Viper</p>
       </div>
     </header>
 
-    <!-- ══════ FEATURES GRID ══════ -->
     <section class="card features-section" id="featuresCard">
       <h2 class="features-title">Why Play IPL Auction Game?</h2>
       <p class="features-subtitle">Experience the thrill of being an IPL team owner. Build your dream squad with real auction mechanics.</p>
@@ -86,14 +81,12 @@
       </div>
     </section>
 
-    <!-- ══════ JOIN / CREATE — UNIFIED ══════ -->
     <section class="card join-section" id="teamSelectCard">
       <div class="join-tabs" id="joinTabs">
         <button class="join-tab active" data-tab="new" id="tabNew"><i class="fa-solid fa-bolt"></i> New Game</button>
         <button class="join-tab" data-tab="join" id="tabJoin"><i class="fa-solid fa-right-to-bracket"></i> Join Room</button>
       </div>
 
-      <!-- NEW GAME TAB -->
       <div class="join-tab-content active" id="tabContentNew">
         <label class="join-label">
           Your Name
@@ -112,7 +105,6 @@
         </button>
       </div>
 
-      <!-- JOIN ROOM TAB -->
       <div class="join-tab-content" id="tabContentJoin">
         <label class="join-label">
           Your Name
@@ -136,10 +128,8 @@
       <p id="joinMessage" class="message" style="text-align:center;"></p>
     </section>
 
-    <!-- Hidden dummy joinCard for app.js hide/show logic -->
     <div id="joinCard" class="hidden"></div>
 
-    <!-- ══════ ROOM INFO ══════ -->
     <section class="card hidden" id="roomCard">
       <div class="row between" style="flex-wrap:wrap; gap:16px;">
         <div>
@@ -190,7 +180,6 @@
       </div>
     </section>
 
-    <!-- ══════ AUCTION DESK ══════ -->
     <section class="card hidden" id="auctionCard">
       <div class="row between" style="flex-wrap:wrap;gap:12px;margin-bottom:16px;">
         <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;color:#fff;">
@@ -199,7 +188,6 @@
         <div id="auctionProgressText" class="badge-pill" style="font-size:0.8rem;">0 / 0 players</div>
       </div>
 
-      <!-- Host Controls (only visible to host) -->
       <div id="hostControls" class="hidden" style="margin-bottom:16px;">
         <div class="row" style="gap:10px;flex-wrap:wrap;padding:16px;background:rgba(245,166,35,0.06);border-radius:14px;border:1px solid rgba(245,166,35,0.15);">
           <button id="startAuctionBtn" class="accent">
@@ -228,9 +216,7 @@
         </div>
       </div>
 
-      <!-- Player LOT box -->
       <div class="lot-box" id="lotBox" style="position:relative;">
-        <!-- Timer ring -->
         <div class="timer-container hidden" id="timerContainer">
           <svg class="timer-ring" viewBox="0 0 100 100">
             <circle class="timer-ring-bg" cx="50" cy="50" r="45"/>
@@ -253,22 +239,18 @@
             <div class="stat-label">Base Price</div>
             <div class="stat-value" id="basePriceText">—</div>
           </div>
-          <div class="stat-box">
-            <div class="stat-label">Rating</div>
-            <div class="stat-value" id="playerRatingText">—</div>
-          </div>
+         
           <div class="stat-box">
             <div class="stat-label">Type</div>
             <div class="stat-value" id="playerTypeText" style="font-size:0.95rem;">—</div>
           </div>
-          <div class="stat-box" style="grid-column: span 1;">
+          <div class="stat-box">
             <div class="stat-label">Highest Bid</div>
             <div id="highestBidText">—</div>
           </div>
         </div>
       </div>
 
-      <!-- Bid Controls (shown for team owners when live) -->
       <div class="card bid-panel hidden" id="bidCard" style="margin-top:16px;">
         <div class="row between" style="margin-bottom:12px;">
           <h3 class="bid-title"><i class="fa-solid fa-hand-holding-dollar"></i> Place Your Bid</h3>
@@ -286,7 +268,6 @@
       </div>
     </section>
 
-    <!-- ══════ TEAMS & SQUADS ══════ -->
     <section class="card hidden" id="teamsCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-shield-halved"></i> Teams &amp; Squads</h2>
@@ -306,44 +287,31 @@
       </div>
       <div class="market-watch-grid">
         <div class="market-watch-col">
-          <h3>Upcoming Players</h3>
+          <h3>Upcoming</h3>
           <div id="upcomingList" class="market-list"></div>
         </div>
         <div class="market-watch-col">
-          <h3>Sold Players</h3>
+          <h3>Sold</h3>
           <div id="soldList" class="market-list"></div>
         </div>
         <div class="market-watch-col">
-          <h3>Unsold Players</h3>
+          <h3>Unsold</h3>
           <div id="unsoldList" class="market-list"></div>
         </div>
       </div>
     </section>
 
-    <!-- ══════ PLAYING XI ══════ -->
     <section class="card hidden" id="playing11Card">
       <div class="section-header">
         <h2><i class="fa-solid fa-people-group"></i> Submit Playing XI</h2>
         <div class="xi-counters">
           <span id="xiCountChip" class="counter-chip">0 / 11 selected</span>
           <span id="xiOverseasChip" class="counter-chip overseas">✈️ 0 / 4 overseas</span>
-          <span id="impactPlayerChip" class="counter-chip">Impact: Not selected</span>
         </div>
-      </div>
-      <p class="muted-text">
-        <i class="fa-solid fa-circle-exclamation" style="color:var(--accent);"></i>
-        Select exactly 11 players from your squad, then choose 1 optional Impact Player from the remaining bench. Max 4 overseas across XI + Impact.
-      </p>
-      <div class="role-legend">
-        <span class="role-dot bat">BAT</span>
-        <span class="role-dot bowl">BOWL</span>
-        <span class="role-dot ar">AR</span>
-        <span class="role-dot wk">WK</span>
-        <span class="role-dot os">✈️ OS</span>
       </div>
       <div id="playing11List" class="player-pills"></div>
       <div class="impact-picker">
-        <label for="impactPlayerSelect" class="join-label impact-label">Impact Player (optional)</label>
+        <label for="impactPlayerSelect" class="join-label impact-label">Impact Player</label>
         <div class="row impact-row">
           <select id="impactPlayerSelect" class="impact-select">
             <option value="">Select Impact Player</option>
@@ -359,37 +327,25 @@
       <p id="playing11Message" class="message"></p>
     </section>
 
-    <!-- ══════ AI ANALYSIS ══════ -->
     <section class="card hidden" id="aiCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-robot"></i> AI Squad Analysis</h2>
       </div>
-      <div id="aiSquadPreview" style="margin-bottom:14px;"></div>
       <button id="analyzeBtn" class="accent">
         <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI
       </button>
       <div id="aiResult" class="hidden" style="margin-top:16px;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;" id="aiScoreBar"></div>
-        <div id="aiCommentary" style="font-size:0.9rem;color:var(--ink-dim);line-height:1.7;white-space:pre-wrap;background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);"></div>
+        <div id="aiCommentary"></div>
       </div>
-      <p id="aiMessage" class="message"></p>
     </section>
 
-    <!-- ══════ RANKINGS ══════ -->
     <section class="card hidden" id="rankingsCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-trophy"></i> Team Rankings</h2>
       </div>
       <div id="rankingsTable"></div>
-      <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
-        <button id="bestTeamAiBtn" class="accent">
-          <i class="fa-solid fa-brain"></i> AI Evaluate Best Team
-        </button>
-        <p id="bestTeamAiMsg" class="message" style="margin-top:8px;"></p>
-      </div>
     </section>
 
-    <!-- ══════ LIVE FEED ══════ -->
     <section class="card hidden" id="logsCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-bolt"></i> Live Auction Feed</h2>
@@ -400,9 +356,20 @@
 
   </main>
 
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>&copy; <span id="currentYear"></span> Your Name. All rights reserved.</p>
+      <p class="footer-tagline">Building the ultimate 2026 Auction experience.</p>
+    </div>
+  </footer>
+
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
   <script src="teams.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Quick script to ensure the year is always current
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  </script>
 </body>
 
 </html>
