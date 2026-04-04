@@ -1171,9 +1171,9 @@ io.on("connection", socket => {
     const room = getParticipantRoom(socket);
     if (!room || !assertHost(socket, room) || room.status !== "live" || !room.currentLot) return;
     stopTimer(room);
-    const skippedName = room.currentLot.name;
-    finalizeLot(room, "unsold");
-    pushLog(room, `⏭️ ${skippedName} was skipped by host.`);
+    const lot = room.currentLot;
+    lot.unsold = true;
+    findNextLot(room);
     broadcastState(room);
   });
 

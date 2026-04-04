@@ -1166,8 +1166,6 @@ on(els.pauseAuctionBtn, "click", () => {
 
 on(els.skipPlayerBtn, "click", () => {
   if (!state.room?.currentLot) return;
-  const name = state.room.currentLot.name;
-  if (!window.confirm(`Skip "${name}" and mark as unsold?`)) return;
   socket.emit("skip_player");
 });
 
