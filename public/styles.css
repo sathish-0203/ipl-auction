@@ -151,6 +151,31 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .wr-section-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.16em; color: var(--secondary); text-transform: uppercase; }
 .wr-progress-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 
+/* ---- AUCTION DECK ---- */
+.wr-auction-deck { padding: 16px 20px; border-bottom: 1px solid var(--border-light); background: rgba(25,28,31,0.5); }
+.wr-deck-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.wr-deck-title { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; color: var(--secondary); text-transform: uppercase; }
+.wr-deck-auto-toggle { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--primary); cursor: pointer; transition: all 180ms; font-size: 1rem; }
+.wr-deck-auto-toggle:hover { background: var(--surface-high); border-color: var(--primary); }
+.wr-deck-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.wr-deck-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid; font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; cursor: pointer; transition: all 180ms; text-transform: uppercase; white-space: nowrap; }
+.wr-deck-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.wr-deck-btn.start-btn { border-color: rgba(109,213,140,0.4); background: rgba(109,213,140,0.08); color: #6dd58c; }
+.wr-deck-btn.start-btn:hover:not(:disabled) { background: rgba(109,213,140,0.15); border-color: rgba(109,213,140,0.6); }
+.wr-deck-btn.pause-btn { border-color: rgba(255,179,71,0.4); background: rgba(255,179,71,0.08); color: #ffb347; }
+.wr-deck-btn.pause-btn:hover:not(:disabled) { background: rgba(255,179,71,0.15); border-color: rgba(255,179,71,0.6); }
+.wr-deck-btn.skip-btn { border-color: rgba(151,203,255,0.4); background: rgba(151,203,255,0.08); color: var(--primary); }
+.wr-deck-btn.skip-btn:hover:not(:disabled) { background: rgba(151,203,255,0.15); border-color: rgba(151,203,255,0.6); }
+.wr-deck-btn.end-btn { border-color: rgba(255,180,171,0.4); background: rgba(255,180,171,0.08); color: #ffb4ab; }
+.wr-deck-btn.end-btn:hover:not(:disabled) { background: rgba(255,180,171,0.15); border-color: rgba(255,180,171,0.6); }
+.wr-deck-btn.eval-btn { border-color: rgba(196,181,253,0.4); background: rgba(196,181,253,0.08); color: #c4b5fd; }
+.wr-deck-btn.eval-btn:hover:not(:disabled) { background: rgba(196,181,253,0.15); border-color: rgba(196,181,253,0.6); }
+.wr-deck-btn .material-symbols-outlined { font-size: 0.9rem; }
+.wr-deck-divider { width: 1px; height: 32px; background: var(--border-light); }
+.wr-deck-select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; color: var(--ink); font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 180ms; }
+.wr-deck-select:hover { border-color: var(--primary); }
+.wr-deck-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(151,203,255,0.12); }
+
 /* Queue strip */
 .wr-queue-strip { padding: 16px 20px 0; border-bottom: 1px solid var(--border-light); }
 .wr-queue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -367,6 +392,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .wr-auction-split { grid-template-columns: 1fr; }
   .wr-bid-panel { border-top: 1px solid var(--border-light); }
   .wr-waiting-panel { display: none; }
+  .wr-deck-actions { flex-wrap: wrap; gap: 6px; }
+  .wr-deck-divider { display: none; }
 }
 @media (max-width: 768px) {
   .wr-body-layout { flex-direction: column; height: auto; overflow: visible; }
@@ -377,6 +404,14 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .wr-host-controls { width: 100%; flex-wrap: wrap; justify-content: flex-start; }
   .wr-btn-start, .wr-btn-pause, .wr-btn-end, .wr-btn-eval { flex: 1; min-width: 70px; }
   .wr-timer-select { width: 100%; }
+  .wr-auction-deck { padding: 12px 16px; }
+  .wr-deck-header { margin-bottom: 10px; }
+  .wr-deck-title { font-size: 0.68rem; }
+  .wr-deck-actions { gap: 4px; }
+  .wr-deck-btn { padding: 6px 10px; font-size: 0.65rem; }
+  .wr-deck-btn span:last-child { display: none; }
+  .wr-deck-select { padding: 5px 8px; font-size: 0.65rem; }
+  .wr-deck-divider { display: none; }
   .wr-player-name { font-size: 1.6rem; }
   .wr-bid-amount { font-size: 1.8rem; }
   .wr-queue-strip { padding: 12px 14px 0; }
@@ -390,4 +425,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .team-circle-img { width: 26px; height: 26px; }
   .wr-host-controls { width: 100%; gap: 4px; }
   .wr-btn-start, .wr-btn-pause, .wr-btn-end, .wr-btn-eval { padding: 6px 8px; font-size: 0.6rem; }
+  .wr-auction-deck { padding: 10px 12px; }
+  .wr-deck-btn { padding: 5px 8px; font-size: 0.55rem; gap: 3px; }
+  .wr-deck-select { padding: 4px 6px; font-size: 0.6rem; }
 }

@@ -121,6 +121,15 @@ const els = {
   endAuctionBtn:     document.getElementById("endAuctionBtn"),
   evaluateBtn:       document.getElementById("evaluateBtn"),
   timerSelect:       document.getElementById("timerSelect"),
+  
+  // Auction Deck buttons
+  deckStartBtn:      document.getElementById("deckStartBtn"),
+  deckPauseBtn:      document.getElementById("deckPauseBtn"),
+  deckSkipBtn:       document.getElementById("deckSkipBtn"),
+  deckEndBtn:        document.getElementById("deckEndBtn"),
+  deckEvaluateBtn:   document.getElementById("deckEvaluateBtn"),
+  deckTimerSelect:   document.getElementById("deckTimerSelect"),
+  
   postAuctionActions: document.getElementById("postAuctionActions"),
 
   // Lot box
@@ -1260,6 +1269,34 @@ on(els.joinBtn, "click", () => {
 on(els.startAuctionBtn, "click", () => {
   socket.emit("set_timer_duration", { duration: els.timerSelect.value });
   socket.emit("start_auction", { timerDuration: Number(els.timerSelect.value) });
+});
+
+/* Auction Deck buttons */
+on(els.deckStartBtn, "click", () => {
+  socket.emit("set_timer_duration", { duration: els.deckTimerSelect.value });
+  socket.emit("start_auction", { timerDuration: Number(els.deckTimerSelect.value) });
+});
+
+on(els.deckPauseBtn, "click", () => {
+  socket.emit("toggle_pause");
+});
+
+on(els.deckSkipBtn, "click", () => {
+  socket.emit("skip_player");
+});
+
+on(els.deckEndBtn, "click", () => {
+  if (confirm("Are you sure you want to end the auction? All teams will proceed to Playing XI submission.")) {
+    socket.emit("end_auction");
+  }
+});
+
+on(els.deckEvaluateBtn, "click", () => {
+  socket.emit("evaluate_rankings");
+});
+
+on(els.deckTimerSelect, "change", () => {
+  socket.emit("set_timer_duration", { duration: els.deckTimerSelect.value });
 });
 
 

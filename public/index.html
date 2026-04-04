@@ -210,6 +210,51 @@
       <!-- Main content -->
       <main class="wr-main">
 
+        <!-- Auction Deck Controls -->
+        <section class="wr-auction-deck" id="auctionDeckCard">
+          <div class="wr-deck-header">
+            <div class="wr-deck-title">
+              <span class="material-symbols-outlined" style="font-size:1.3rem;color:#ffdb3c;">local_activity</span>
+              AUCTION DECK
+            </div>
+            <button id="autoPlayToggle" class="wr-deck-auto-toggle" title="Auto-play next player">
+              <span class="material-symbols-outlined">auto_awesome</span>
+            </button>
+          </div>
+          <div class="wr-deck-actions">
+            <button id="deckStartBtn" class="wr-deck-btn start-btn" title="Start the auction">
+              <span class="material-symbols-outlined">play_arrow</span>
+              <span>START</span>
+            </button>
+            <button id="deckPauseBtn" class="wr-deck-btn pause-btn" title="Pause the auction">
+              <span class="material-symbols-outlined">pause</span>
+              <span>PAUSE</span>
+            </button>
+            <button id="deckSkipBtn" class="wr-deck-btn skip-btn" title="Skip current player">
+              <span class="material-symbols-outlined">skip_next</span>
+              <span>SKIP</span>
+            </button>
+            <button id="deckEndBtn" class="wr-deck-btn end-btn" title="End the auction">
+              <span class="material-symbols-outlined">stop</span>
+              <span>END</span>
+            </button>
+            <div class="wr-deck-divider"></div>
+            <select id="deckTimerSelect" class="wr-deck-select" title="Select timer duration">
+              <option value="5">5s</option>
+              <option value="10" selected>10s</option>
+              <option value="15">15s</option>
+              <option value="20">20s</option>
+              <option value="30">30s</option>
+              <option value="45">45s</option>
+              <option value="60">60s</option>
+            </select>
+            <button id="deckEvaluateBtn" class="wr-deck-btn eval-btn" title="Evaluate and rank teams">
+              <span class="material-symbols-outlined">bar_chart</span>
+              <span>RANK</span>
+            </button>
+          </div>
+        </section>
+
         <!-- Upcoming queue strip -->
         <section class="wr-queue-strip" id="marketWatchCard">
           <div class="wr-queue-header">
