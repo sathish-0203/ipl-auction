@@ -208,9 +208,6 @@
           <button id="pauseAuctionBtn" class="btn-unsold">
             <i class="fa-solid fa-pause"></i> Pause Auction
           </button>
-          <button id="skipPlayerBtn" class="btn-eval">
-            <i class="fa-solid fa-forward-step"></i> Skip Player
-          </button>
           <button id="endAuctionBtn" class="btn-sold">
             <i class="fa-solid fa-flag-checkered"></i> End Auction
           </button>
@@ -275,6 +272,9 @@
       <div class="card bid-panel hidden" id="bidCard" style="margin-top:16px;">
         <div class="row between" style="margin-bottom:12px;">
           <h3 class="bid-title"><i class="fa-solid fa-hand-holding-dollar"></i> Place Your Bid</h3>
+          <button id="skipPlayerBtn" class="btn-eval" style="font-size:0.8rem;padding:6px 14px;" title="Vote to skip this player">
+            <i class="fa-solid fa-forward-step"></i> Skip
+          </button>
         </div>
         <div class="row bid-bar" style="gap:12px;flex-wrap:wrap;">
           <button id="quickBidBtn" class="accent giant-bid-btn">

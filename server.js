@@ -503,6 +503,9 @@ function broadcastState(room) {
 
 function findNextLot(room) {
   stopTimer(room);
+  // Reset skip votes for the new lot
+  room.skipVotes = new Set();
+  room.skipVoteLotId = null;
   while (room.lotIndex < room.players.length) {
     const candidate = room.players[room.lotIndex];
     room.lotIndex++;
@@ -1169,12 +1172,38 @@ io.on("connection", socket => {
   /* ── skip_player ── */
   socket.on("skip_player", () => {
     const room = getParticipantRoom(socket);
-    if (!room || !assertHost(socket, room) || room.status !== "live" || !room.currentLot) return;
-    stopTimer(room);
-    const lot = room.currentLot;
-    lot.unsold = true;
-    findNextLot(room);
-    broadcastState(room);
+    if (!room || room.status !== "live" || !room.currentLot) return;
+
+    const participant = room.participants[socket.id];
+    if (!participant || !participant.teamId) return; // only team owners (incl. host with team) can vote
+
+    const lotId = room.currentLot.id;
+
+    // Init skip votes for this lot
+    if (!room.skipVotes || room.skipVoteLotId !== lotId) {
+      room.skipVotes = new Set();
+      room.skipVoteLotId = lotId;
+    }
+
+    room.skipVotes.add(socket.id);
+
+    // Count active team owners (connected participants with a teamId)
+    const activeOwners = Object.values(room.participants).filter(p => p.teamId).length;
+    const voteCount = room.skipVotes.size;
+
+    if (voteCount >= activeOwners) {
+      // All voted — skip silently
+      room.skipVotes = new Set();
+      room.skipVoteLotId = null;
+      stopTimer(room);
+      room.currentLot.unsold = true;
+      findNextLot(room);
+      broadcastState(room);
+    } else {
+      // Broadcast updated vote count so clients can show progress
+      broadcastState(room);
+      io.to(room.roomId).emit("skip_vote_update", { votes: voteCount, needed: activeOwners });
+    }
   });
 
   /* ── submit_playing11 ── */

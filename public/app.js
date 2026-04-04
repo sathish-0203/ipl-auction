@@ -1056,7 +1056,8 @@ function render() {
     els.endAuctionBtn.disabled = state.room.status !== "live";
   }
   if (els.skipPlayerBtn) {
-    els.skipPlayerBtn.disabled = state.room.status !== "live" || !state.room.currentLot || state.room.isPaused;
+    const canVoteSkip = Boolean(state.teamId) && state.room.status === "live" && state.room.currentLot && !state.room.isPaused;
+    els.skipPlayerBtn.disabled = !canVoteSkip;
   }
   
   const isLive = state.room.status === "live";
@@ -1440,7 +1441,12 @@ socket.on("playing11_error", msg => {
 
 socket.on("room_state", roomState => {
   state.isOptimisticLoading = false; // Server has synced back
+  const prevLotId = state.room?.currentLot?.id;
   state.room = roomState;
+  // Reset skip button label when lot changes
+  if (els.skipPlayerBtn && roomState.currentLot?.id !== prevLotId) {
+    els.skipPlayerBtn.innerHTML = `<i class="fa-solid fa-forward-step"></i> Skip`;
+  }
   if (els.timerSelect && Number.isFinite(Number(roomState.timerDuration))) {
     els.timerSelect.value = String(roomState.timerDuration);
   }
@@ -1450,6 +1456,12 @@ socket.on("room_state", roomState => {
 socket.on("connect_error", () => {
   const target = socketServerUrl || window.location.origin;
   setJoinMessage(`Connection failed. Ensure server is running at ${target}, then refresh.`);
+});
+
+socket.on("skip_vote_update", ({ votes, needed }) => {
+  if (els.skipPlayerBtn) {
+    els.skipPlayerBtn.innerHTML = `<i class="fa-solid fa-forward-step"></i> Skip (${votes}/${needed})`;
+  }
 });
 
 socket.on("connect", () => {
