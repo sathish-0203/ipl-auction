@@ -130,13 +130,28 @@ function myTeam() {
 // ════════════════════════════════════════
 
 function renderTeamsAccordion() {
-  if (!state.room) return;
+  if (!state.room || !state.room.teams) {
+    console.log("⚠️ No teams data");
+    els.teamsAccordion.innerHTML = '<div class="p-6 text-slate-500">No teams yet</div>';
+    return;
+  }
+  
+  console.log("🏆 Rendering", state.room.teams.length, "teams");
   els.teamsAccordion.innerHTML = "";
   
   state.room.teams.forEach((team, idx) => {
     const cfg = teamConfig(team.id);
-    const spent = 120 - team.purse;
+    const spent = (team.soldPrice || 0);
     const isMyTeam = team.id === state.teamId;
+    
+    const squadHTML = team.squad && team.squad.length > 0 
+      ? team.squad.map(p => `
+          <div class="flex justify-between items-center text-[10px] text-slate-400 py-1">
+            <span>${p.name}</span>
+            <span class="text-primary">${cr(p.soldPrice)}</span>
+          </div>
+        `).join('')
+      : '<div class="text-[10px] text-slate-600">No players yet</div>';
     
     const html = `
       <div class="border-b border-outline-variant/10">
@@ -145,8 +160,8 @@ function renderTeamsAccordion() {
           <div class="flex items-center gap-4">
             <span class="material-symbols-outlined text-slate-400">${isMyTeam ? 'shield' : 'group'}</span>
             <div class="flex flex-col">
-              <span class="text-xs font-headline font-bold tracking-widest uppercase" style="color: ${isMyTeam ? cfg.primary : '#e1e2e7'}">${cfg.short}</span>
-              <span class="text-[10px] text-primary">₹${team.purse} Cr · ${team.squad.length} players</span>
+              <span class="text-xs font-headline font-bold tracking-widest uppercase" style="color: ${cfg.primary}">${cfg.short}</span>
+              <span class="text-[10px] text-slate-400">₹${team.purse || 0} Cr · ${(team.squad?.length || 0)} players</span>
             </div>
           </div>
           <span class="material-symbols-outlined text-slate-600 text-sm transition-transform expand-icon">expand_more</span>
@@ -154,14 +169,7 @@ function renderTeamsAccordion() {
         <div class="team-accordion-content bg-[#15181b]/50">
           <div class="px-6 py-3 space-y-2 overflow-y-auto max-h-40 custom-scrollbar">
             <div class="text-[10px] font-headline font-bold text-slate-500 uppercase tracking-widest mb-1 border-b border-outline-variant/10 pb-1">Squad · Spent ${cr(spent)}</div>
-            ${team.squad.length === 0 
-              ? '<div class="text-[10px] text-slate-600">No players yet</div>'
-              : team.squad.map(p => `
-                <div class="flex justify-between items-center text-[10px] text-slate-400 py-1">
-                  <span>${p.name}</span>
-                  <span class="text-primary">${cr(p.soldPrice)}</span>
-                </div>
-              `).join('')}
+            ${squadHTML}
           </div>
         </div>
       </div>
@@ -362,7 +370,12 @@ function updateAuctionStatus() {
 }
 
 function render() {
-  if (!state.room) return;
+  if (!state.room) {
+    console.log("⚠️ No room data yet", state);
+    return;
+  }
+  
+  console.log("🎨 Rendering with room:", state.room.roomId, "Teams:", state.room.teams?.length);
   
   els.roomCodeDisplay.textContent = state.room.roomId;
   els.pageTitle.textContent = `${state.room.roomId} | IPL Auction`;
@@ -381,16 +394,24 @@ function render() {
 // ════════════════════════════════════════
 
 els.startAuctionBtn?.addEventListener("click", () => {
+  console.log("▶️ Start auction clicked");
   socket.emit("start_auction", { timerDuration: 10 });
 });
 
-// Pause button (if it exists)
+// Pause button listener
 const pauseAuctionBtn = document.getElementById("pauseAuctionBtn");
-pauseAuctionBtn?.addEventListener("click", () => {
-  socket.emit("pause_auction", { paused: !state.room?.isPaused });
-});
+if (pauseAuctionBtn) {
+  console.log("✅ Pause button found, adding listener");
+  pauseAuctionBtn.addEventListener("click", () => {
+    console.log("⏸️ Pause button clicked, isPaused:", state.room?.isPaused);
+    socket.emit("pause_auction", { paused: !state.room?.isPaused });
+  });
+} else {
+  console.log("❌ Pause button NOT found!");
+}
 
 els.endAuctionBtn?.addEventListener("click", () => {
+  console.log("⏹️ End auction clicked");
   if (confirm("End the auction?")) {
     socket.emit("end_auction");
   }
@@ -399,6 +420,7 @@ els.endAuctionBtn?.addEventListener("click", () => {
 [els.presetBid1, els.presetBid2, els.presetBid3].forEach(btn => {
   btn?.addEventListener("click", () => {
     const amount = parseFloat(btn.dataset.amount);
+    console.log("💰 Preset bid clicked:", amount);
     if (amount) socket.emit("place_bid", { amount });
   });
 });
@@ -408,6 +430,7 @@ els.placeBidBtn?.addEventListener("click", () => {
     const nextAmount = state.room.currentBid 
       ? getMinimumNextBid(state.room.currentBid.amount, state.room.currentLot.basePrice)
       : state.room.currentLot.basePrice;
+    console.log("🎯 Place bid clicked:", nextAmount);
     socket.emit("place_bid", { amount: nextAmount });
   }
 });
@@ -415,6 +438,7 @@ els.placeBidBtn?.addEventListener("click", () => {
 els.chatSendBtn?.addEventListener("click", () => {
   const message = els.chatInput.value.trim();
   if (message) {
+    console.log("💬 Chat message:", message);
     socket.emit("send_message", { message });
     els.chatInput.value = "";
   }
@@ -440,7 +464,12 @@ els.mobileLeaveBtn?.addEventListener("click", () => {
 // SOCKET EVENTS
 // ════════════════════════════════════════
 
+socket.on("connect", () => {
+  console.log("🔗 Socket connected!");
+});
+
 socket.on("room_joined", ({ roomId, role, teamId, shareLink }) => {
+  console.log("✅ Joined room:", roomId, "as", role, "team:", teamId);
   state.roomId = roomId;
   state.role = role;
   state.teamId = teamId;
@@ -452,27 +481,35 @@ socket.on("room_joined", ({ roomId, role, teamId, shareLink }) => {
 });
 
 socket.on("room_state", (roomState) => {
+  console.log("📊 Room state received:", {
+    roomId: roomState?.roomId,
+    teams: roomState?.teams?.length,
+    currentLot: roomState?.currentLot?.name,
+    status: roomState?.status
+  });
   state.isOptimisticLoading = false;
   state.room = roomState;
   render();
 });
 
 socket.on("chat_message", ({ sender, senderRole, message }) => {
+  console.log("💬 Chat:", sender, "-", message);
   renderChat(sender, message, sender === state.name, senderRole === "host");
 });
 
 socket.on("bid_placed", () => {
+  console.log("💰 Bid placed");
   updateBidControls();
 });
 
 socket.on("lot_sold", (data) => {
-  // Trigger animation or notification
+  console.log("🔨 Lot sold:", data?.playerName);
   renderBidHistory();
   render();
 });
 
 socket.on("disconnect", () => {
-  console.log("Disconnected from server");
+  console.log("❌ Disconnected from server");
 });
 
 // ════════════════════════════════════════
@@ -480,17 +517,36 @@ socket.on("disconnect", () => {
 // ════════════════════════════════════════
 
 function init() {
+  // Get query params
+  const params = new URLSearchParams(window.location.search);
+  const roomId = params.get('room');
+  
+  // Try to get from localStorage
   const sessionData = JSON.parse(localStorage.getItem("auction_session") || "{}");
-  if (sessionData.roomId && sessionData.role && sessionData.teamId) {
+  
+  if (roomId || (sessionData.roomId && sessionData.role && sessionData.teamId)) {
     state.name = sessionData.name || "Guest";
+    
+    // Emit rejoin with available data
     socket.emit("rejoin_room", {
-      roomId: sessionData.roomId,
-      role: sessionData.role,
-      teamId: sessionData.teamId,
+      roomId: roomId || sessionData.roomId,
+      role: sessionData.role || "spectator",
+      teamId: sessionData.teamId || null,
       participantName: state.name
     });
   }
 }
 
-// Start app
-init();
+// Wait for socket connection then init
+if (socket.connected) {
+  init();
+} else {
+  socket.once("connect", () => {
+    init();
+  });
+}
+
+// Also init after a small delay
+setTimeout(() => {
+  if (!state.room) init();
+}, 1000);
