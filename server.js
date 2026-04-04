@@ -971,8 +971,10 @@ io.on("connection", socket => {
       lastAuctionSignature: "",
     };
 
-    // Host can also own a team
+    // Host can also own a team — if they own a team, register them
+    // as a `team-owner` in participants so their capabilities match joiners.
     let hostTeamId = null;
+    let role = "host";
     const chosenTeam = preferredTeamId
       ? room.teams.find(t => t.id === preferredTeamId)
       : room.teams[0];
@@ -980,9 +982,10 @@ io.on("connection", socket => {
       chosenTeam.ownerSocketId = socket.id;
       chosenTeam.ownerName     = (hostName || "Host").trim();
       hostTeamId = chosenTeam.id;
+      role = "team-owner"; // treat creator like a joined team-owner when they own a team
     }
 
-    room.participants[socket.id] = { name: room.hostName, role: "host", teamId: hostTeamId };
+    room.participants[socket.id] = { name: room.hostName, role, teamId: hostTeamId };
 
     rooms.set(roomId, room);
     socket.join(roomId);
@@ -992,7 +995,7 @@ io.on("connection", socket => {
     pushLog(room, `${room.hostName} created the room${teamMsg}. Waiting for other teams…`);
 
     const shareLink = `${APP_URL}?room=${roomId}`;
-    socket.emit("room_joined", { roomId, role: "host", teamId: hostTeamId, shareLink });
+    socket.emit("room_joined", { roomId, role, teamId: hostTeamId, shareLink });
     broadcastState(room);
   });
 
