@@ -41,17 +41,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
 /* ══════════════════════════════════════════════════
-   ROUTING
-══════════════════════════════════════════════════ */
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-app.get("/war-room", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "war-room-new.html"));
-});
-
-/* ══════════════════════════════════════════════════
    PLAYER DATA — prefers external dataset file
 ══════════════════════════════════════════════════ */
 const BASE_PLAYERS = loadAuctionPlayers();
@@ -487,7 +476,6 @@ function getPublicState(room) {
     roomId:           room.roomId,
     status:           room.status,
     hostSocketId:     room.hostSocketId,
-    hostControls:     room.hostControls !== undefined ? Boolean(room.hostControls) : true,
     hostName:         room.hostName,
     teams:            room.teams,
     logs:             room.logs,
@@ -913,55 +901,6 @@ app.post("/api/analyze-rankings", async (req, res) => {
 });
 
 /* ══════════════════════════════════════════════════
-   CREATE ROOM ENDPOINT — REST API for room creation
-══════════════════════════════════════════════════ */
-app.post("/api/create-room", (req, res) => {
-  const { hostName, preferredTeamId, hostControls = true } = req.body;
-  if (!hostName || typeof hostName !== 'string') {
-    return res.status(400).json({ error: "hostName is required" });
-  }
-
-  let roomId = createRoomCode();
-  while (rooms.has(roomId)) roomId = createRoomCode();
-
-  const room = {
-    roomId,
-    status:         "lobby",
-    hostSocketId:   null,
-    hostName:       hostName.trim(),
-    hostControls:   Boolean(hostControls),
-    teams:          buildInitialTeams(),
-    players:        BASE_PLAYERS.map(p => ({ ...p })),
-    lotIndex:       0,
-    currentLot:     null,
-    currentBid:     null,
-    logs:           [],
-    participants:   {},
-    playing11Submissions: {},
-    rankings:       null,
-    timerDuration:  10,
-    timerLeft:      0,
-    timerInterval:  null,
-    isPaused:       false,
-    lastAuctionSignature: "",
-  };
-
-  let hostTeamId = null;
-  const chosenTeam = preferredTeamId
-    ? room.teams.find(t => t.id === preferredTeamId)
-    : room.teams[0];
-
-  if (chosenTeam) {
-    hostTeamId = chosenTeam.id;
-  }
-
-  rooms.set(roomId, room);
-  pushLog(room, `Room created by ${hostName} (hostControls: ${hostControls}). Waiting for connection…`);
-
-  res.json({ roomId, hostTeamId });
-});
-
-/* ══════════════════════════════════════════════════
    SHARE ENDPOINT — generates share URLs
 ══════════════════════════════════════════════════ */
 app.get("/api/share/:roomId", (req, res) => {
@@ -996,16 +935,15 @@ function assertHost(socket, room) {
 io.on("connection", socket => {
 
   /* ── create_room ── */
-  socket.on("create_room", ({ hostName, preferredTeamId, hostControls = true } = {}) => {
+  socket.on("create_room", ({ hostName, preferredTeamId }) => {
     let roomId = createRoomCode();
     while (rooms.has(roomId)) roomId = createRoomCode();
 
     const room = {
       roomId,
       status:         "lobby",
-      hostSocketId:   hostControls ? socket.id : null,
+      hostSocketId:   socket.id,
       hostName:       (hostName || "Host").trim(),
-      hostControls:   Boolean(hostControls),
       teams:          buildInitialTeams(),
       players:        BASE_PLAYERS.map(p => ({ ...p })), // clone; shuffle at start
       lotIndex:       0,
@@ -1022,10 +960,8 @@ io.on("connection", socket => {
       lastAuctionSignature: "",
     };
 
-    // Host can also own a team — if they own a team, register them
-    // as a `team-owner` in participants so their capabilities match joiners.
+    // Host can also own a team
     let hostTeamId = null;
-    let role = hostControls ? "host" : "team-owner"; // if hostControls disabled, creator acts as a normal team-owner when owning a team
     const chosenTeam = preferredTeamId
       ? room.teams.find(t => t.id === preferredTeamId)
       : room.teams[0];
@@ -1033,13 +969,9 @@ io.on("connection", socket => {
       chosenTeam.ownerSocketId = socket.id;
       chosenTeam.ownerName     = (hostName || "Host").trim();
       hostTeamId = chosenTeam.id;
-      role = "team-owner"; // creator owning a team becomes team-owner
     }
 
-    // If hostControls is false and creator does not own a team, they are a spectator (no host privileges)
-    if (!hostControls && !hostTeamId) role = "spectator";
-
-    room.participants[socket.id] = { name: room.hostName, role, teamId: hostTeamId };
+    room.participants[socket.id] = { name: room.hostName, role: "host", teamId: hostTeamId };
 
     rooms.set(roomId, room);
     socket.join(roomId);
@@ -1049,23 +981,7 @@ io.on("connection", socket => {
     pushLog(room, `${room.hostName} created the room${teamMsg}. Waiting for other teams…`);
 
     const shareLink = `${APP_URL}?room=${roomId}`;
-    socket.emit("room_joined", { roomId, role, teamId: hostTeamId, shareLink });
-
-    // If hostControls is disabled, start the auction automatically so everyone
-    // can bid without host start/pause/end controls.
-    if (!room.hostControls) {
-      const randomized = buildRandomizedAuctionOrder(BASE_PLAYERS, room.lastAuctionSignature);
-      room.players = randomized.ordered;
-      room.lastAuctionSignature = randomized.signature || "";
-      room.status = "live";
-      room.lotIndex = 0;
-      room.rankings = null;
-      room.playing11Submissions = {};
-      room.isPaused = false;
-      pushLog(room, `Auto-started auction (host controls disabled). Players loaded: ${room.players.length}. Timer: ${room.timerDuration}s.`);
-      findNextLot(room);
-    }
-
+    socket.emit("room_joined", { roomId, role: "host", teamId: hostTeamId, shareLink });
     broadcastState(room);
   });
 
@@ -1436,24 +1352,6 @@ io.on("connection", socket => {
     const shareLink = `${APP_URL}?room=${room.roomId}`;
     socket.emit("room_joined", { roomId: room.roomId, role: "spectator", teamId: null, shareLink });
     broadcastState(room);
-  });
-
-  /* ── send_message ── */
-  socket.on("send_message", ({ message }) => {
-    const room = getParticipantRoom(socket);
-    if (!room) return;
-    
-    const participant = room.participants[socket.id];
-    if (!participant) return;
-    
-    const cleanedMessage = String(message || "").trim().slice(0, 100);
-    if (!cleanedMessage) return;
-    
-    io.to(room.roomId).emit("chat_message", {
-      sender: participant.name,
-      senderRole: participant.role,
-      message: cleanedMessage
-    });
   });
 
   /* ── disconnect ── */
