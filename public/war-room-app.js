@@ -357,19 +357,24 @@ function updateAuctionStatus() {
   
   els.auctionStatusText.textContent = `${statusMap[status] || status} • ${lotIndex}/${totalLots}`;
   els.playersRemainingText.textContent = `${totalLots - lotIndex} PLAYERS`;
-  // Show/hide host controls based on room setting
+  // Show host controls only when room has hostControls AND this client is the host
   const pauseBtn = document.getElementById("pauseAuctionBtn");
-  if (!hostControls) {
+  const shareBtn = document.getElementById("shareRoomBtn");
+  const isHostClient = state.role === 'host';
+
+  if (!hostControls || !isHostClient) {
     if (els.startAuctionBtn) els.startAuctionBtn.style.display = 'none';
     if (els.endAuctionBtn) els.endAuctionBtn.style.display = 'none';
     if (pauseBtn) pauseBtn.style.display = 'none';
+    if (shareBtn) shareBtn.style.display = 'none';
     return;
   }
 
-  // Otherwise, ensure controls are visible and set enabled state
+  // Otherwise, show host controls and set enabled state
   if (els.startAuctionBtn) els.startAuctionBtn.style.display = '';
   if (els.endAuctionBtn) els.endAuctionBtn.style.display = '';
   if (pauseBtn) pauseBtn.style.display = '';
+  if (shareBtn) shareBtn.style.display = '';
 
   if (status === 'live') {
     els.startAuctionBtn.disabled = true;
@@ -422,6 +427,20 @@ if (pauseAuctionBtn) {
   });
 } else {
   console.log("❌ Pause button NOT found!");
+}
+
+// Share room button (host only)
+const shareRoomBtn = document.getElementById("shareRoomBtn");
+if (shareRoomBtn) {
+  shareRoomBtn.addEventListener("click", async () => {
+    const link = state.shareLink || `${window.location.origin}${window.location.pathname}?room=${state.roomId}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      alert("Share link copied to clipboard");
+    } catch (e) {
+      prompt("Copy link", link);
+    }
+  });
 }
 
 els.endAuctionBtn?.addEventListener("click", () => {
