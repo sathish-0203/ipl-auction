@@ -1527,7 +1527,11 @@ socket.on("room_joined", ({ roomId, role, teamId, shareLink }) => {
 
   if (role === "team-owner") {
     const teamCfg = TEAM_DATA.find(t => t.id === teamId);
-    setJoinMessage(`✓ Joined as owner of ${teamCfg ? teamCfg.short : "a team"}!`, false);
+    setJoinMessage(`✓ Joined as owner of ${teamCfg ? teamCfg.short : "a team"}! Redirecting...`, false);
+    // Redirect team owners to new war room interface
+    setTimeout(() => {
+      window.location.href = `/war-room?room=${roomId}`;
+    }, 1000);
   } else if (role === "host") {
     setJoinMessage(`✓ Room created! Share the code above.`, false);
   } else {

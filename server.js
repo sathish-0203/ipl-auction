@@ -41,6 +41,17 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
 /* ══════════════════════════════════════════════════
+   ROUTING
+══════════════════════════════════════════════════ */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/war-room", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "war-room-new.html"));
+});
+
+/* ══════════════════════════════════════════════════
    PLAYER DATA — prefers external dataset file
 ══════════════════════════════════════════════════ */
 const BASE_PLAYERS = loadAuctionPlayers();

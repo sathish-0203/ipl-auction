@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">IPL Auction Arena | War Room</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'surface': '#0f1216',
+            'surface-container-low': '#15181b',
+            'surface-container': '#191c1f',
+            'surface-container-high': '#1f2225',
+            'surface-container-highest': '#2b2f33',
+            'outline-variant': '#49454f',
+            'primary': '#e1ab00',
+            'secondary': '#625b71',
+            'tertiary': '#7d5260',
+            'error': '#f2b8b5',
+            'on-error': '#601410',
+          },
+          fontFamily: {
+            'headline': ['Space Grotesk', 'sans-serif'],
+            'body': ['Manrope', 'sans-serif'],
+          },
+          keyframes: {
+            'glow': {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(225, 171, 0, 0.3), inset 0 0 20px rgba(225, 171, 0, 0.1)' },
+              '50%': { boxShadow: '0 0 30px rgba(225, 171, 0, 0.6), inset 0 0 30px rgba(225, 171, 0, 0.2)' }
+            }
+          },
+          animation: {
+            'glow': 'glow 2s ease-in-out infinite'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Material Symbols Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <style>
+    * { font-family: 'Manrope', sans-serif; }
+    .font-headline { font-family: 'Space Grotesk', sans-serif; }
+    
+    html { background: #0f1216; color: #e1e2e7; }
+    body { background: #0f1216; }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #15181b; }
+    ::-webkit-scrollbar-thumb { background: #49454f; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #625b71; }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #49454f; }
+    
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    .glow-active {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    /* Accordion Styles */
+    .team-accordion-input { display: none; }
+    .team-accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .team-accordion-input:checked ~ .team-accordion-content {
+      max-height: 300px;
+    }
+    .team-accordion-input:checked ~ label .expand-icon {
+      transform: rotate(180deg);
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+      @apply relative px-6 py-2.5 bg-primary text-[#0f1216] font-headline font-bold text-sm rounded-full overflow-hidden transition-all duration-300;
+    }
+    .btn-primary:hover:not(:disabled) {
+      @apply shadow-lg;
+      box-shadow: 0 0 20px rgba(225, 171, 0, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn-primary:disabled {
+      @apply opacity-50 cursor-not-allowed;
+    }
+    
+    .btn-secondary {
+      @apply px-4 py-2 bg-surface-container-high border border-outline-variant/30 text-slate-300 font-body font-semibold text-xs rounded-lg transition-all;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      @apply border-primary bg-surface-container-highest;
+    }
+    .btn-secondary:disabled {
+      @apply opacity-40 cursor-not-allowed;
+    }
+    
+    /* Responsive breakpoints */
+    @media (max-width: 1024px) {
+      .sidebar-hide { display: none !important; }
+      .main-expand { grid-column: 1 / -1; }
+    }
+    
+    @media (max-width: 768px) {
+      .header-compact { gap: 8px; }
+      .mobile-only { display: block; }
+      .mobile-hide { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-surface text-white">
+
+<!-- ════════════════════════════════════════
+     MAIN CONTAINER
+════════════════════════════════════════ -->
+<div class="flex flex-col h-screen bg-surface">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 bg-gradient-to-b from-surface-container to-surface border-b border-outline-variant/10 px-4 md:px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <!-- Logo & Room Code -->
+      <div class="flex items-center gap-4">
+        <span class="material-symbols-outlined text-primary">sports_kabaddi</span>
+        <div>
+          <div class="text-xs font-body text-slate-500 uppercase tracking-widest">Room ID</div>
+          <div id="roomCodeDisplay" class="text-lg font-headline font-bold text-primary">LOADING...</div>
+        </div>
+      </div>
+      
+      <!-- Auction Status -->
+      <div class="hidden md:flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full border border-outline-variant/20">
+        <span class="material-symbols-outlined text-primary text-sm">schedule</span>
+        <span class="text-xs font-headline font-bold" id="auctionStatusText">LOADING...</span>
+      </div>
+      
+      <!-- Teams Count -->
+      <div class="flex items-center gap-3">
+        <div class="text-center">
+          <div class="text-[10px] text-slate-500 uppercase font-headline">Teams Present</div>
+          <div class="text-lg font-headline font-bold">
+            <span id="teamsLiveCount">0</span><span class="text-slate-500">/10</span>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-2">
+          <button id="startAuctionBtn" class="btn-primary hidden md:inline-block py-2 text-xs">
+            <span class="material-symbols-outlined inline text-sm mr-1">play_arrow</span>
+            START
+          </button>
+          <button id="pauseAuctionBtn" class="btn-secondary hidden md:inline-block">
+            <span class="material-symbols-outlined inline text-xs mr-1">pause</span>
+            PAUSE
+          </button>
+          <button id="endAuctionBtn" class="btn-secondary hidden md:inline-block">
+            <span class="material-symbols-outlined inline text-xs mr-1">stop</span>
+            END
+          </button>
+        </div>
+      </div>
+      
+      <!-- Leave Button -->
+      <button id="mobileLeaveBtn" class="md:hidden btn-secondary p-2">
+        <span class="material-symbols-outlined">logout</span>
+      </button>
+      <button id="leaveRoomBtn" class="hidden md:inline btn-secondary">LEAVE</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-4 gap-0">
+
+    <!-- ════════════════════════════════════════
+         LEFT SIDEBAR (Teams)
+════════════════════════════════════════ -->
+    <aside class="sidebar-hide lg:col-span-1 bg-surface-container border-r border-outline-variant/10 overflow-y-auto custom-scrollbar">
+      <div class="p-4 bg-surface-container-high border-b border-outline-variant/10 sticky top-0">
+        <div class="text-xs font-headline font-bold text-primary uppercase tracking-widest mb-1">TEAMS</div>
+        <div class="text-sm" id="teamsPresentCount">0/10 PRESENT</div>
+      </div>
+      
+      <!-- Teams Accordion -->
+      <div id="teamsAccordion"></div>
+    </aside>
+
+    <!-- ════════════════════════════════════════
+         CENTER CONTENT
+════════════════════════════════════════ -->
+    <main class="lg:col-span-3 flex flex-col overflow-hidden">
+      
+      <!-- Upcoming Queue (Horizontal Scroll) -->
+      <div class="bg-surface-container-high border-b border-outline-variant/10 p-4">
+        <div class="text-xs font-headline font-bold text-slate-400 uppercase tracking-widest mb-3">
+          <span class="material-symbols-outlined align-text-bottom text-sm">arrow_forward</span>
+          Upcoming Players · <span id="playersRemainingText">450</span>
+        </div>
+        <div id="upcomingQueueContainer" class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar scroll-smooth"></div>
+      </div>
+
+      <!-- Players Section & Betting Area -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar">
+        <div class="p-6 space-y-6">
+
+          <!-- Current Player Display -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Player Info Card -->
+            <div class="md:col-span-1 bg-surface-container-high rounded-xl border border-outline-variant/20 p-6 overflow-hidden relative">
+              <div class="absolute inset-0 opacity-20 pointer-events-none" style="background: linear-gradient(135deg, rgba(225,171,0,0.1) 0%, transparent 100%);"></div>
+              <div class="relative z-10">
+                <div class="flex justify-between items-start mb-4">
+                  <span class="px-3 py-1 bg-primary/20 text-primary text-[10px] font-bold rounded-full" id="playerStatusBadge">WAITING</span>
+                  <span class="material-symbols-outlined text-3xl text-primary" id="hammerIcon" style="font-variation-settings: 'FILL' 0">gavel</span>
+                </div>
+                
+                <div class="mb-6 pb-4 border-b border-outline-variant/10">
+                  <div class="text-2xl font-headline font-bold mb-1" id="playerNameDisplay">No Player</div>
+                  <div class="text-sm text-slate-400">Base Price <span id="basePriceDisplay" class="text-primary font-bold">—</span></div>
+                </div>
+                
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between"><span class="text-slate-500">Role:</span><span class="font-bold" id="playerRoleDisplay">—</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Rating:</span><span class="font-bold" id="playerRatingDisplay">—</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Type:</span><span class="font-bold" id="playerTypeDisplay">—</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Home Team:</span><span class="font-bold" id="playerTeamDisplay">—</span></div>
+                  <div class="flex justify-between"><span class="text-slate-500">Overseas:</span><span class="font-bold" id="playerOverseasDisplay">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bid Control Card -->
+            <div class="md:col-span-2 bg-gradient-to-br from-surface-container-high to-surface-container rounded-xl border border-primary/20 p-6">
+              <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-surface-container p-4 rounded-lg border border-outline-variant/10">
+                  <div class="text-xs text-slate-500 uppercase tracking-widest font-headline mb-1">Highest Bid</div>
+                  <div class="flex justify-between items-end">
+                    <span class="text-2xl font-headline font-bold text-primary" id="highestBidDisplay">—</span>
+                    <span class="text-sm text-slate-400" id="highestBidTeamDisplay">—</span>
+                  </div>
+                </div>
+                <div class="bg-surface-container p-4 rounded-lg border border-primary/20">
+                  <div class="text-xs text-slate-500 uppercase tracking-widest font-headline mb-1">Next Bid</div>
+                  <span class="text-2xl font-headline font-bold text-primary" id="nextBidAmountDisplay">—</span>
+                </div>
+              </div>
+
+              <!-- Preset Bid Buttons -->
+              <div class="grid grid-cols-3 gap-2 mb-4">
+                <button id="presetBid1" class="btn-secondary">+0.5 Cr</button>
+                <button id="presetBid2" class="btn-secondary">+0.75 Cr</button>
+                <button id="presetBid3" class="btn-secondary">+1 Cr</button>
+              </div>
+
+              <!-- Place Bid Button -->
+              <button id="placeBidBtn" class="btn-primary w-full py-3 text-base mb-3">
+                <span class="material-symbols-outlined align-text-bottom">gavel</span>
+                PLACE BID
+              </button>
+
+              <!-- Bid Message -->
+              <div id="bidMessage" class="text-center text-[10px]"></div>
+            </div>
+          </div>
+
+          <!-- Bid History -->
+          <div class="bg-surface-container-high rounded-xl border border-outline-variant/20 p-6">
+            <div class="text-xs font-headline font-bold text-slate-400 uppercase tracking-widest mb-4">Recent Bids</div>
+            <div id="bidHistoryContainer" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ════════════════════════════════════════
+       BOTTOM CHAT (Mobile & Desktop)
+════════════════════════════════════════ -->
+  <div class="bg-surface-container border-t border-outline-variant/10 p-4 max-h-32 border-b border-outline-variant/10">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-xs font-headline font-bold text-slate-400 uppercase tracking-widest mb-2">Live Chat</div>
+      <div class="flex gap-2">
+        <div id="chatMessagesContainer" class="flex-1 bg-surface-container-high rounded-lg p-3 max-h-20 overflow-y-auto custom-scrollbar text-[11px] space-y-1 border border-outline-variant/10"></div>
+        <div class="flex gap-1">
+          <input id="chatInput" type="text" placeholder="Message..." class="px-3 py-2 bg-surface-container text-white text-xs rounded-lg border border-outline-variant/20 focus:border-primary outline-none transition-all" />
+          <button id="chatSendBtn" class="btn-primary p-2">
+            <span class="material-symbols-outlined text-sm">send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Socket.IO -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+<!-- App Script -->
+<script src="/war-room-app.js"></script>
+
+</body>
+</html>
