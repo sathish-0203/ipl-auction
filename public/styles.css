@@ -71,7 +71,7 @@ body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--i
 
 /* ---- WAR ROOM LAYOUT ---- */
 .wr-warroom { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
-.wr-topnav { position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; height: 60px; background: rgba(17,20,23,0.95); border-bottom: 1px solid var(--border-light); backdrop-filter: blur(12px); gap: 12px; flex-wrap: wrap; }
+.wr-topnav { position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; min-height: 60px; background: rgba(17,20,23,0.95); border-bottom: 1px solid var(--border-light); backdrop-filter: blur(12px); gap: 12px; flex-wrap: wrap; }
 .wr-topnav-left { display: flex; align-items: center; gap: 24px; }
 .wr-room-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.06em; color: var(--primary); }
 .wr-topnav-nav { display: flex; gap: 16px; }
@@ -98,7 +98,7 @@ body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--i
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Body layout */
-.wr-body-layout { display: flex; flex: 1; height: calc(100vh - 60px); overflow: hidden; position: relative; z-index: 1; }
+.wr-body-layout { display: flex; flex: 1; height: auto; min-height: calc(100vh - 80px); overflow: hidden; position: relative; z-index: 1; }
 
 /* ---- SIDEBAR ---- */
 .wr-sidebar { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border-light); background: rgba(17,20,23,0.8); overflow: hidden; }
@@ -372,8 +372,11 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .wr-body-layout { flex-direction: column; height: auto; overflow: visible; }
   .wr-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-light); }
   .wr-sidebar-teams { max-height: 200px; }
-  .wr-topnav { height: auto; padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
-  .wr-host-controls { flex-wrap: wrap; }
+  .wr-topnav { min-height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+  .wr-topnav-right { flex-basis: 100%; }
+  .wr-host-controls { width: 100%; flex-wrap: wrap; justify-content: flex-start; }
+  .wr-btn-start, .wr-btn-pause, .wr-btn-end, .wr-btn-eval { flex: 1; min-width: 70px; }
+  .wr-timer-select { width: 100%; }
   .wr-player-name { font-size: 1.6rem; }
   .wr-bid-amount { font-size: 1.8rem; }
   .wr-queue-strip { padding: 12px 14px 0; }
@@ -385,4 +388,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .wr-player-stats { grid-template-columns: 1fr 1fr; }
   .team-circle { width: 40px; height: 40px; }
   .team-circle-img { width: 26px; height: 26px; }
+  .wr-host-controls { width: 100%; gap: 4px; }
+  .wr-btn-start, .wr-btn-pause, .wr-btn-end, .wr-btn-eval { padding: 6px 8px; font-size: 0.6rem; }
 }
