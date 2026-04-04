@@ -147,6 +147,22 @@ const els = {
   quickBidBtn:    document.getElementById("quickBidBtn"),
   quickBidAmount: document.getElementById("quickBidAmount"),
   bidMessage:     document.getElementById("bidMessage"),
+  
+  // Quick bid presets
+  presetBid1:     document.getElementById("presetBid1"),
+  presetBid2:     document.getElementById("presetBid2"),
+  presetBid3:     document.getElementById("presetBid3"),
+  preset1Text:    document.getElementById("preset1Text"),
+  preset2Text:    document.getElementById("preset2Text"),
+  preset3Text:    document.getElementById("preset3Text"),
+  
+  // Chat
+  chatBox:        document.getElementById("chatBox"),
+  chatInput:      document.getElementById("chatInput"),
+  chatSendBtn:    document.getElementById("chatSendBtn"),
+  
+  // Export
+  exportCsvBtn:   document.getElementById("exportCsvBtn"),
 
   // Teams / Squads
   teamsCard:           document.getElementById("teamsCard"),
@@ -310,6 +326,17 @@ function cr(val) {
   if (val === undefined || val === null) return "—";
   const n = Number(val);
   return `₹${n % 1 === 0 ? n : n.toFixed(2)} Cr`;
+}
+
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
 }
 
 function getMinimumNextBid(currentAmount, basePrice) {
@@ -488,12 +515,28 @@ function updateBidControls() {
   // Set the attribute so the button knows what value it represents
   if (els.quickBidBtn) els.quickBidBtn.dataset.amount = nextAmount;
 
+  // Update preset bid buttons
+  const preset1 = nextAmount + 0.5;
+  const preset2 = nextAmount + 0.75;
+  const preset3 = nextAmount + 1.0;
+  
+  if (els.preset1Text) els.preset1Text.textContent = cr(preset1);
+  if (els.preset2Text) els.preset2Text.textContent = cr(preset2);
+  if (els.preset3Text) els.preset3Text.textContent = cr(preset3);
+  
+  if (els.presetBid1) els.presetBid1.dataset.amount = preset1;
+  if (els.presetBid2) els.presetBid2.dataset.amount = preset2;
+  if (els.presetBid3) els.presetBid3.dataset.amount = preset3;
+
   const team = myTeam();
   const isHighestBidder = Boolean(team && bid && bid.teamId === team.id);
 
   if (isHighestBidder) {
     els.quickBidBtn.disabled = true;
     els.quickBidBtn.style.opacity = "0.45";
+    els.presetBid1.disabled = true;
+    els.presetBid2.disabled = true;
+    els.presetBid3.disabled = true;
     setBidMessage("You are already the highest bidder. Wait for another team to counter.", false);
     return;
   }
@@ -502,6 +545,9 @@ function updateBidControls() {
   if (team && nextAmount > team.purse) {
     els.quickBidBtn.disabled = true;
     els.quickBidBtn.style.opacity = "0.4";
+    els.presetBid1.disabled = true;
+    els.presetBid2.disabled = true;
+    els.presetBid3.disabled = true;
     setBidMessage(`💰 Insufficient purse (₹${team.purse} Cr). Next bid: ${cr(nextAmount)}`, false);
     return;
   }
@@ -510,6 +556,9 @@ function updateBidControls() {
   if (team) {
     els.quickBidBtn.disabled = false;
     els.quickBidBtn.style.opacity = "1";
+    els.presetBid1.disabled = team.purse < preset1;
+    els.presetBid2.disabled = team.purse < preset2;
+    els.presetBid3.disabled = team.purse < preset3;
     if (els.bidMessage && els.bidMessage.textContent) {
       setBidMessage("", false);
     }
@@ -1358,6 +1407,96 @@ on(els.submitXIBtn, "click", () => {
   });
 });
 
+/* ── Preset Bid Buttons ── */
+on(els.presetBid1, "click", () => {
+  const amount = els.presetBid1.dataset.amount;
+  if (amount) {
+    socket.emit("place_bid", { amount: parseFloat(amount) });
+  }
+});
+
+on(els.presetBid2, "click", () => {
+  const amount = els.presetBid2.dataset.amount;
+  if (amount) {
+    socket.emit("place_bid", { amount: parseFloat(amount) });
+  }
+});
+
+on(els.presetBid3, "click", () => {
+  const amount = els.presetBid3.dataset.amount;
+  if (amount) {
+    socket.emit("place_bid", { amount: parseFloat(amount) });
+  }
+});
+
+/* ── Chat Functionality ── */
+on(els.chatSendBtn, "click", () => {
+  const message = els.chatInput.value.trim();
+  if (!message) return;
+  socket.emit("send_message", { message });
+  els.chatInput.value = "";
+});
+
+on(els.chatInput, "keypress", (e) => {
+  if (e.key === "Enter") {
+    els.chatSendBtn.click();
+  }
+});
+
+/* ── Export CSV ── */
+on(els.exportCsvBtn, "click", () => {
+  exportAuctionToCSV();
+});
+
+function exportAuctionToCSV() {
+  if (!state.room) return;
+  
+  const teams = state.room.teams;
+  const sold = state.room.soldPlayers || [];
+  
+  // Create CSV content
+  let csv = "IPL Auction Results Export\n";
+  csv += `Room ID: ${state.room.roomId}\n\n`;
+  
+  // Teams summary
+  csv += "TEAMS SUMMARY\n";
+  csv += "Team,Owner,Purse Left,Players Bought,Spent\n";
+  teams.forEach(team => {
+    const cfg = teamConfig(team.id);
+    const spent = 120 - team.purse;
+    csv += `${cfg.name},${team.ownerName || "Vacant"},${team.purse} Cr,${team.squad.length},${spent} Cr\n`;
+  });
+  
+  csv += "\n\nSOLD PLAYERS\n";
+  csv += "Player,Team,Price,Role,Overseas\n";
+  sold.forEach(p => {
+    const team = teams.find(t => t.id === p.soldTo);
+    const teamName = team ? team.name : "Unknown";
+    csv += `${p.name},${teamName},${p.soldPrice} Cr,${p.role},${p.overseas ? "Yes" : "No"}\n`;
+  });
+  
+  // Team squads
+  csv += "\n\nTEAM SQUADS\n";
+  teams.forEach(team => {
+    csv += `\n${team.name}\n`;
+    csv += "Player,Role,Price,Overseas,Rating\n";
+    team.squad.forEach(player => {
+      csv += `${player.name},${player.role},${player.soldPrice} Cr,${player.overseas ? "Yes" : "No"},${player.rating}\n`;
+    });
+  });
+  
+  // Download CSV
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `auction_${state.room.roomId}_${Date.now()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
 /* ══════════════════════════════════════════════════
    SOCKET STATE SYNC
 ══════════════════════════════════════════════════ */
@@ -1423,6 +1562,15 @@ socket.on("playing11_ok", msg => {
 
 socket.on("playing11_error", msg => {
   setXIMessage(msg);
+});
+
+socket.on("chat_message", ({ sender, senderRole, message }) => {
+  if (!els.chatBox) return;
+  const msgEl = document.createElement("div");
+  msgEl.className = `wr-chat-message ${sender === state.name ? "own" : senderRole === "host" ? "host" : ""}`;
+  msgEl.innerHTML = `<span class="wr-chat-sender">${sender}:</span> ${escapeHtml(message)}`;
+  els.chatBox.appendChild(msgEl);
+  els.chatBox.scrollTop = els.chatBox.scrollHeight;
 });
 
 socket.on("room_state", roomState => {

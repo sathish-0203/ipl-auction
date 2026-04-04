@@ -144,6 +144,25 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .wr-share-app { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--ink-dim); font-size: 0.85rem; text-decoration: none; transition: all 180ms; }
 .wr-share-app:hover { border-color: var(--primary); color: var(--primary); background: rgba(151,203,255,0.08); }
 
+/* Sidebar chat */
+.wr-sidebar-chat { padding: 12px 16px; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 8px; min-height: 0; flex: 1; }
+.wr-chat-header { display: flex; align-items: center; gap: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; color: var(--secondary); text-transform: uppercase; }
+.wr-chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; min-height: 100px; padding: 8px 0; }
+.wr-chat-messages::-webkit-scrollbar { width: 3px; }
+.wr-chat-messages::-webkit-scrollbar-thumb { background: rgba(151,203,255,0.1); border-radius: 2px; }
+.wr-chat-message { padding: 6px 8px; border-radius: 6px; background: rgba(0,0,0,0.2); font-size: 0.7rem; line-height: 1.3; color: var(--ink-dim); animation: wr-msg-in 200ms ease; }
+.wr-chat-message.own { background: rgba(109,213,140,0.08); border-left: 2px solid rgba(109,213,140,0.4); }
+.wr-chat-message.host { background: rgba(151,203,255,0.08); border-left: 2px solid rgba(151,203,255,0.4); color: var(--primary); }
+@keyframes wr-msg-in { from { transform: translateY(4px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.wr-chat-sender { font-weight: 700; color: var(--primary); font-size: 0.65rem; margin-right: 4px; }
+.wr-chat-input-row { display: flex; gap: 4px; align-items: center; }
+.wr-chat-input { flex: 1; font: inherit; font-size: 0.7rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; color: var(--ink); min-width: 0; }
+.wr-chat-input::placeholder { color: var(--muted); opacity: 0.6; }
+.wr-chat-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(151,203,255,0.08); }
+.wr-chat-send-btn { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-high); color: var(--primary); cursor: pointer; transition: all 180ms; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.wr-chat-send-btn:hover { background: var(--primary-container); color: #fff; border-color: var(--primary-container); }
+.wr-chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* ---- MAIN CONTENT ---- */
 .wr-main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0; }
 .wr-main::-webkit-scrollbar { width: 4px; }
@@ -248,6 +267,16 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 @keyframes wr-log-in { from { transform: translateX(-6px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .log-time { color: var(--muted); font-size: 0.65rem; margin-right: 6px; font-weight: 600; }
 
+/* Quick Bid Presets */
+.wr-quick-bid-presets { margin-top: 12px; padding: 12px; background: rgba(151,203,255,0.04); border: 1px solid rgba(151,203,255,0.12); border-radius: var(--radius-sm); }
+.wr-presets-label { font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; }
+.wr-presets-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.wr-preset-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 10px 8px; border: 1px solid rgba(151,203,255,0.25); border-radius: 8px; background: rgba(151,203,255,0.08); color: var(--primary); font-family: 'Space Grotesk', sans-serif; font-weight: 700; cursor: pointer; transition: all 180ms; }
+.wr-preset-btn:hover:not(:disabled) { background: rgba(151,203,255,0.15); border-color: rgba(151,203,255,0.4); transform: translateY(-1px); }
+.wr-preset-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.preset-amount { font-size: 0.78rem; font-weight: 700; }
+.preset-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em; }
+
 /* Waiting panel */
 .wr-waiting-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px; }
 .wr-waiting-text { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.06em; }
@@ -264,8 +293,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .player-role-badge { padding: 3px 12px; border-radius: 999px; font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
 
 /* ---- POST AUCTION ---- */
-.wr-post-auction { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; }
+.wr-post-auction { display: flex; flex-direction: column; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border-light); }
+.wr-post-actions-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .wr-post-auction .wr-btn-primary { width: auto; margin-top: 0; }
+.wr-post-auction .wr-btn-secondary { width: auto; margin-top: 0; }
 .wr-post-hint { font-size: 0.78rem; color: var(--muted); }
 
 /* ---- INNER CARDS (Playing XI, AI, Rankings) ---- */

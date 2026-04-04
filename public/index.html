@@ -205,6 +205,21 @@
             <a id="shareEmail" class="wr-share-app" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-envelope"></i></a>
           </div>
         </div>
+
+        <!-- Live Chat -->
+        <div class="wr-sidebar-chat">
+          <div class="wr-chat-header">
+            <span class="material-symbols-outlined" style="font-size:1rem;">chat</span>
+            <span class="wr-chat-label">LIVE CHAT</span>
+          </div>
+          <div class="wr-chat-messages" id="chatBox"></div>
+          <div class="wr-chat-input-row">
+            <input id="chatInput" class="wr-chat-input" type="text" placeholder="Type message..." maxlength="100" />
+            <button id="chatSendBtn" class="wr-chat-send-btn" title="Send message">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          </div>
+        </div>
       </aside>
 
       <!-- Main content -->
@@ -339,6 +354,25 @@
               <span id="quickBidAmount" class="wr-bid-amount-tag">₹—</span>
             </button>
 
+            <!-- Quick Bid Presets -->
+            <div class="wr-quick-bid-presets">
+              <div class="wr-presets-label">Quick Bids</div>
+              <div class="wr-presets-buttons">
+                <button id="presetBid1" class="wr-preset-btn" data-multiplier="1">
+                  <span class="preset-amount" id="preset1Text">₹0.50 Cr</span>
+                  <span class="preset-label">LOW</span>
+                </button>
+                <button id="presetBid2" class="wr-preset-btn" data-multiplier="2">
+                  <span class="preset-amount" id="preset2Text">₹0.75 Cr</span>
+                  <span class="preset-label">MID</span>
+                </button>
+                <button id="presetBid3" class="wr-preset-btn" data-multiplier="3">
+                  <span class="preset-amount" id="preset3Text">₹1.00 Cr</span>
+                  <span class="preset-label">HIGH</span>
+                </button>
+              </div>
+            </div>
+
             <p id="bidMessage" class="wr-bid-msg"></p>
 
             <!-- Bid history / logs inline -->
@@ -360,10 +394,15 @@
 
         <!-- Post auction actions -->
         <div id="postAuctionActions" class="wr-post-auction hidden">
-          <button id="goPlaying11Btn" class="wr-btn-primary">
-            <span class="material-symbols-outlined">clipboard</span> MAKE PLAYING XI
-          </button>
-          <span class="wr-post-hint">Submit 11 players to analyze and rank teams.</span>
+          <div class="wr-post-actions-row">
+            <button id="goPlaying11Btn" class="wr-btn-primary">
+              <span class="material-symbols-outlined">clipboard</span> MAKE PLAYING XI
+            </button>
+            <button id="exportCsvBtn" class="wr-btn-secondary">
+              <span class="material-symbols-outlined">download</span> EXPORT CSV
+            </button>
+          </div>
+          <span class="wr-post-hint">Submit 11 players to analyze and rank teams. Download auction results.</span>
         </div>
 
         <!-- ══════ PLAYING XI ══════ -->

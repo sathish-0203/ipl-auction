@@ -1354,6 +1354,24 @@ io.on("connection", socket => {
     broadcastState(room);
   });
 
+  /* ── send_message ── */
+  socket.on("send_message", ({ message }) => {
+    const room = getParticipantRoom(socket);
+    if (!room) return;
+    
+    const participant = room.participants[socket.id];
+    if (!participant) return;
+    
+    const cleanedMessage = String(message || "").trim().slice(0, 100);
+    if (!cleanedMessage) return;
+    
+    io.to(room.roomId).emit("chat_message", {
+      sender: participant.name,
+      senderRole: participant.role,
+      message: cleanedMessage
+    });
+  });
+
   /* ── disconnect ── */
   socket.on("disconnect", () => {
     const room = getParticipantRoom(socket);
