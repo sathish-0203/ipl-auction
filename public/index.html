@@ -140,14 +140,15 @@
     <div id="joinCard" class="hidden"></div>
 
     <!-- ══════ ROOM INFO ══════ -->
-    <section class="card hidden" id="roomCard">
+    <section class="card hidden" id="roomCard" style="border-bottom: 2px solid var(--accent);">
       <div class="row between" style="flex-wrap:wrap; gap:16px;">
         <div>
-          <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;color:#fff;">
+          <div class="dashboard-title">
             <i class="fa-solid fa-users" style="color:var(--accent);margin-right:8px;"></i>
-            Room <span id="roomCodeText" style="color:var(--accent);letter-spacing:0.08em;"></span>
-          </h2>
-          <p id="identityText" style="margin-top:4px;font-size:0.92rem;color:var(--ink-dim);"></p>
+            Auction Arena
+            <span id="roomCodeText" class="room-id-badge"></span>
+          </div>
+          <p id="identityText" style="margin-top:4px;font-size:0.92rem;color:var(--ink-dim);letter-spacing:0.02em;"></p>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <div id="myPurseChip" class="purse-chip" style="display:none;">
@@ -155,32 +156,11 @@
             Purse: <strong id="myPurseText">₹120 Cr</strong>
           </div>
           <span id="statusChip" class="status-chip">
-            <i class="fa-solid fa-satellite-dish"></i>
+            <span class="live-pulse" id="livePulse" style="display:none;"></span>
+            <i class="fa-solid fa-satellite-dish" id="statusIcon"></i>
             <span id="statusText">Lobby</span>
           </span>
         </div>
-      </div>
-      <div class="row" style="margin-top:16px; gap:10px; flex-wrap:wrap;">
-        <p class="small"><i class="fa-solid fa-share-nodes" style="color:var(--accent);margin-right:4px;"></i>Share Link:</p>
-        <input id="shareLinkInput" readonly title="Share room link" style="flex:1;min-width:200px;font-size:0.82rem;" />
-        <button id="copyLinkBtn" style="padding:8px 14px;font-size:0.82rem;">
-          <i class="fa-solid fa-copy"></i> Copy
-        </button>
-      </div>
-      <div id="shareApps" class="share-apps-row hidden">
-        <span class="small">Share via:</span>
-        <a id="shareWhatsapp" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp
-        </a>
-        <a id="shareTelegram" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
-          <i class="fa-brands fa-telegram"></i> Telegram
-        </a>
-        <a id="shareTwitter" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
-          <i class="fa-brands fa-x-twitter"></i> X
-        </a>
-        <a id="shareEmail" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
-          <i class="fa-solid fa-envelope"></i> Email
-        </a>
       </div>
       <div id="postAuctionActions" class="row hidden" style="margin-top:14px;gap:10px;flex-wrap:wrap;">
         <button id="goPlaying11Btn" class="accent">
@@ -188,6 +168,14 @@
         </button>
         <span class="small">After auction, submit 11 players to analyze and rank teams.</span>
       </div>
+    </section>
+
+    <!-- ══════ UPCOMING PLAYERS (TOP) ══════ -->
+    <section class="card hidden" id="upcomingCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Upcoming Players</h2>
+      </div>
+      <div id="upcomingListTop" class="market-list upcoming-horizontal"></div>
     </section>
 
     <!-- ══════ AUCTION DESK ══════ -->
@@ -301,11 +289,7 @@
       <div class="section-header">
         <h2><i class="fa-solid fa-list-check"></i> Auction Tracker</h2>
       </div>
-      <div class="market-watch-grid">
-        <div class="market-watch-col">
-          <h3>Upcoming Players</h3>
-          <div id="upcomingList" class="market-list"></div>
-        </div>
+      <div class="market-watch-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
         <div class="market-watch-col">
           <h3>Sold Players</h3>
           <div id="soldList" class="market-list"></div>
@@ -375,7 +359,10 @@
     <!-- ══════ RANKINGS ══════ -->
     <section class="card hidden" id="rankingsCard">
       <div class="section-header">
-        <h2><i class="fa-solid fa-trophy"></i> Team Rankings</h2>
+        <h2><i class="fa-solid fa-trophy"></i> Final Rankings</h2>
+        <button id="downloadCsvBtn" class="btn btn-outline small hidden">
+          <i class="fa-solid fa-file-csv"></i> Download CSV
+        </button>
       </div>
       <div id="rankingsTable"></div>
       <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
@@ -390,9 +377,43 @@
     <section class="card hidden" id="logsCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-bolt"></i> Live Auction Feed</h2>
-        <span class="live-dot badge-pill">🔴 Live</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="live-dot badge-pill">🔴 Live</span>
+          <button id="toggleLogsBtn" style="padding:6px 12px;font-size:0.75rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
+            <i class="fa-solid fa-minus" id="toggleLogsIcon"></i> Minimize
+          </button>
+        </div>
       </div>
       <div id="logsBox" class="logs"></div>
+    </section>
+
+    <!-- ══════ SHARE SECTION (BOTTOM) ══════ -->
+    <section class="card hidden" id="shareCard" style="margin-top: 40px; border-top: 1px solid var(--accent);">
+      <div class="section-header">
+        <h3><i class="fa-solid fa-share-nodes" style="color:var(--accent);"></i> Invite Friends to Join</h3>
+      </div>
+      <div class="row" style="gap:10px; flex-wrap:wrap;">
+        <p class="small">Share Link:</p>
+        <input id="shareLinkInput" readonly title="Share room link" style="flex:1;min-width:200px;font-size:0.82rem;" />
+        <button id="copyLinkBtn" style="padding:8px 14px;font-size:0.82rem;">
+          <i class="fa-solid fa-copy"></i> Copy
+        </button>
+      </div>
+      <div id="shareApps" class="share-apps-row hidden">
+        <span class="small">More Ways:</span>
+        <a id="shareWhatsapp" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
+        <a id="shareTelegram" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-telegram"></i> Telegram
+        </a>
+        <a id="shareTwitter" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-x-twitter"></i> X
+        </a>
+        <a id="shareEmail" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-envelope"></i> Email
+        </a>
+      </div>
     </section>
 
   </main>

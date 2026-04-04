@@ -95,6 +95,7 @@ const els = {
   roomCard:       document.getElementById("roomCard"),
   roomCodeText:   document.getElementById("roomCodeText"),
   identityText:   document.getElementById("identityText"),
+  shareCard:      document.getElementById("shareCard"),
   shareLinkInput: document.getElementById("shareLinkInput"),
   copyLinkBtn:    document.getElementById("copyLinkBtn"),
   shareApps:      document.getElementById("shareApps"),
@@ -111,6 +112,8 @@ const els = {
   // Auction & Host Controls
   auctionCard:       document.getElementById("auctionCard"),
   statusText:        document.getElementById("statusText"),
+  livePulse:         document.getElementById("livePulse"),
+  statusIcon:        document.getElementById("statusIcon"),
   statusChip:        document.getElementById("statusChip"),
   myPurseText:       document.getElementById("myPurseText"),
   myPurseChip:       document.getElementById("myPurseChip"),
@@ -145,7 +148,8 @@ const els = {
   teamsGrid:           document.getElementById("teamsGrid"),
   auctionProgressText: document.getElementById("auctionProgressText"),
   marketWatchCard:     document.getElementById("marketWatchCard"),
-  upcomingList:        document.getElementById("upcomingList"),
+  upcomingCard:        document.getElementById("upcomingCard"),
+  upcomingList:        document.getElementById("upcomingListTop"),
   soldList:            document.getElementById("soldList"),
   unsoldList:          document.getElementById("unsoldList"),
 
@@ -172,13 +176,16 @@ const els = {
   // Rankings
   rankingsCard:  document.getElementById("rankingsCard"),
   rankingsTable: document.getElementById("rankingsTable"),
+  downloadCsvBtn: document.getElementById("downloadCsvBtn"),
   bestTeamAiPanel: document.getElementById("bestTeamAiPanel"),
   bestTeamAiBtn: document.getElementById("bestTeamAiBtn"),
   bestTeamAiMsg: document.getElementById("bestTeamAiMsg"),
 
   // Feed
-  logsCard: document.getElementById("logsCard"),
-  logsBox:  document.getElementById("logsBox"),
+  logsCard:   document.getElementById("logsCard"),
+  logsBox:    document.getElementById("logsBox"),
+  toggleLogsBtn: document.getElementById("toggleLogsBtn"),
+  toggleLogsIcon: document.getElementById("toggleLogsIcon")
 };
 
 /* ── Client State ── */
@@ -813,9 +820,16 @@ function renderMarketWatch() {
     targetEl.innerHTML = entries.map(formatter).join("");
   };
 
-  renderEntries(els.upcomingList, upcoming, (p) =>
-    `<div class="market-item"><span>${p.name}</span><span>${p.role} · ${cr(p.basePrice)}</span></div>`
-  );
+  renderEntries(els.upcomingList, upcoming, (p) => {
+    const roleTag = p.overseas ? `${p.role} ✈️` : p.role;
+    return `<div class="market-item">
+      <span class="player-name">${p.name}</span>
+      <div class="player-meta">
+        <span>${roleTag}</span>
+        <span class="price-label">${cr(p.basePrice)}</span>
+      </div>
+    </div>`;
+  });
 
   renderEntries(els.soldList, sold, (p) => {
     const team = state.room.teams.find((t) => t.id === p.soldTo);
@@ -1030,10 +1044,17 @@ function render() {
   if (heroBanner) heroBanner.classList.toggle("hidden", ready);
   
   els.roomCard.classList.toggle("hidden", !ready);
+  els.shareCard.classList.toggle("hidden", !ready);
+  els.upcomingCard.classList.toggle("hidden", !ready);
   els.auctionCard.classList.toggle("hidden", !ready);
   els.teamsCard.classList.toggle("hidden", !ready);
   els.marketWatchCard.classList.toggle("hidden", !ready);
   els.logsCard.classList.toggle("hidden", !ready);
+
+  const isEnded = state.room?.status === "ended";
+  if (els.downloadCsvBtn) {
+    els.downloadCsvBtn.classList.toggle("hidden", !isEnded);
+  }
 
   if (!ready) return;
 
@@ -1044,6 +1065,12 @@ function render() {
   const pausedTag = state.room.isPaused ? " (Paused)" : "";
   const statusLabel = (statusMap[state.room.status] || state.room.status) + pausedTag;
   els.statusText.textContent = `${statusLabel} · ${state.room.lotIndex}/${state.room.totalLots}`;
+  
+  if (els.livePulse) {
+    const isLive = state.room.status === "live";
+    els.livePulse.style.display = isLive ? "" : "none";
+    if (els.statusIcon) els.statusIcon.style.display = isLive ? "none" : "";
+  }
 
   els.hostControls.classList.toggle("hidden", state.role !== "host");
   if (els.pauseAuctionBtn) {
@@ -1490,6 +1517,15 @@ socket.on("connect", () => {
 ══════════════════════════════════════════════════ */
 buildTeamSelector();
 
+// Toggle logs/feed visibility (minimize)
+if (els.toggleLogsBtn) {
+  els.toggleLogsBtn.addEventListener("click", () => {
+    const isMinimized = els.logsBox.classList.toggle("minimized");
+    els.toggleLogsIcon.className = isMinimized ? "fa-solid fa-plus" : "fa-solid fa-minus";
+    els.toggleLogsBtn.innerHTML = `<i class="${els.toggleLogsIcon.className}" id="toggleLogsIcon"></i> ${isMinimized ? "Expand" : "Minimize"}`;
+  });
+}
+
 // Toggle teams grid visibility
 const toggleTeamsBtn = document.getElementById("toggleTeamsBtn");
 const toggleTeamsIcon = document.getElementById("toggleTeamsIcon");
@@ -1513,18 +1549,52 @@ if (tabNew && tabJoin) {
   tabNew.addEventListener("click", () => {
     tabNew.classList.add("active");
     tabJoin.classList.remove("active");
-    tabContentNew.classList.add("active");
-    tabContentJoin.classList.remove("active");
+    if (tabContentNew) tabContentNew.classList.add("active");
+    if (tabContentJoin) tabContentJoin.classList.remove("active");
   });
   tabJoin.addEventListener("click", () => {
     tabJoin.classList.add("active");
     tabNew.classList.remove("active");
-    tabContentJoin.classList.add("active");
-    tabContentNew.classList.remove("active");
+    if (tabContentJoin) tabContentJoin.classList.add("active");
+    if (tabContentNew) tabContentNew.classList.remove("active");
   });
 }
 
-// Pre-fill room code from URL & auto-switch to Join tab
+// ── CSV Export ──
+function downloadSquadsCSV() {
+  if (!state.room || !state.room.teams) return;
+  
+  let csvContent = "Team,Player Name,Role,Nationality,Price (Cr)\n";
+  
+  state.room.teams.forEach(team => {
+    const squad = team.squad || [];
+    squad.forEach(p => {
+      const type = p.overseas ? "Overseas" : "Indian";
+      const price = (p.soldPrice || 0).toFixed(2);
+      // Escape spaces or commas if necessary
+      const playerName = `"${p.name.replace(/"/g, '""')}"`;
+      csvContent += `${team.name},${playerName},${p.role},${type},${price}\n`;
+    });
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  
+  link.setAttribute("href", url);
+  link.setAttribute("download", `IPL_Auction_Results_${timestamp}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+if (els.downloadCsvBtn) {
+  els.downloadCsvBtn.addEventListener("click", downloadSquadsCSV);
+}
+
+// Pre-fill room code ...
 const urlRoom = new URLSearchParams(window.location.search).get("room");
 if (urlRoom) {
   els.roomInput.value = urlRoom;

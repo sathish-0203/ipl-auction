@@ -1196,10 +1196,7 @@ io.on("connection", socket => {
       // All voted — skip silently
       room.skipVotes = new Set();
       room.skipVoteLotId = null;
-      stopTimer(room);
-      room.currentLot.unsold = true;
-      findNextLot(room);
-      broadcastState(room);
+      finalizeLot(room, "unsold");
     } else {
       // Broadcast updated vote count so clients can show progress
       broadcastState(room);
