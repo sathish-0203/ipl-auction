@@ -487,6 +487,7 @@ function getPublicState(room) {
     roomId:           room.roomId,
     status:           room.status,
     hostSocketId:     room.hostSocketId,
+    hostControls:     room.hostControls !== undefined ? Boolean(room.hostControls) : true,
     hostName:         room.hostName,
     teams:            room.teams,
     logs:             room.logs,
@@ -946,15 +947,16 @@ function assertHost(socket, room) {
 io.on("connection", socket => {
 
   /* ── create_room ── */
-  socket.on("create_room", ({ hostName, preferredTeamId }) => {
+  socket.on("create_room", ({ hostName, preferredTeamId, hostControls = true } = {}) => {
     let roomId = createRoomCode();
     while (rooms.has(roomId)) roomId = createRoomCode();
 
     const room = {
       roomId,
       status:         "lobby",
-      hostSocketId:   socket.id,
+      hostSocketId:   hostControls ? socket.id : null,
       hostName:       (hostName || "Host").trim(),
+      hostControls:   Boolean(hostControls),
       teams:          buildInitialTeams(),
       players:        BASE_PLAYERS.map(p => ({ ...p })), // clone; shuffle at start
       lotIndex:       0,
@@ -974,7 +976,7 @@ io.on("connection", socket => {
     // Host can also own a team — if they own a team, register them
     // as a `team-owner` in participants so their capabilities match joiners.
     let hostTeamId = null;
-    let role = "host";
+    let role = hostControls ? "host" : "team-owner"; // if hostControls disabled, creator acts as a normal team-owner when owning a team
     const chosenTeam = preferredTeamId
       ? room.teams.find(t => t.id === preferredTeamId)
       : room.teams[0];
@@ -982,8 +984,11 @@ io.on("connection", socket => {
       chosenTeam.ownerSocketId = socket.id;
       chosenTeam.ownerName     = (hostName || "Host").trim();
       hostTeamId = chosenTeam.id;
-      role = "team-owner"; // treat creator like a joined team-owner when they own a team
+      role = "team-owner"; // creator owning a team becomes team-owner
     }
+
+    // If hostControls is false and creator does not own a team, they are a spectator (no host privileges)
+    if (!hostControls && !hostTeamId) role = "spectator";
 
     room.participants[socket.id] = { name: room.hostName, role, teamId: hostTeamId };
 
@@ -996,6 +1001,22 @@ io.on("connection", socket => {
 
     const shareLink = `${APP_URL}?room=${roomId}`;
     socket.emit("room_joined", { roomId, role, teamId: hostTeamId, shareLink });
+
+    // If hostControls is disabled, start the auction automatically so everyone
+    // can bid without host start/pause/end controls.
+    if (!room.hostControls) {
+      const randomized = buildRandomizedAuctionOrder(BASE_PLAYERS, room.lastAuctionSignature);
+      room.players = randomized.ordered;
+      room.lastAuctionSignature = randomized.signature || "";
+      room.status = "live";
+      room.lotIndex = 0;
+      room.rankings = null;
+      room.playing11Submissions = {};
+      room.isPaused = false;
+      pushLog(room, `Auto-started auction (host controls disabled). Players loaded: ${room.players.length}. Timer: ${room.timerDuration}s.`);
+      findNextLot(room);
+    }
+
     broadcastState(room);
   });
 

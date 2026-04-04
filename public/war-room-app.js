@@ -346,7 +346,8 @@ function updateAuctionStatus() {
   const status = state.room.status;
   const lotIndex = state.room.lotIndex || 0;
   const totalLots = state.room.totalLots || 450;
-  
+  const hostControls = state.room.hostControls !== undefined ? state.room.hostControls : true;
+
   const statusMap = {
     'lobby': '⏳ Lobby',
     'live': '🔴 LIVE',
@@ -356,7 +357,20 @@ function updateAuctionStatus() {
   
   els.auctionStatusText.textContent = `${statusMap[status] || status} • ${lotIndex}/${totalLots}`;
   els.playersRemainingText.textContent = `${totalLots - lotIndex} PLAYERS`;
-  
+  // Show/hide host controls based on room setting
+  const pauseBtn = document.getElementById("pauseAuctionBtn");
+  if (!hostControls) {
+    if (els.startAuctionBtn) els.startAuctionBtn.style.display = 'none';
+    if (els.endAuctionBtn) els.endAuctionBtn.style.display = 'none';
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    return;
+  }
+
+  // Otherwise, ensure controls are visible and set enabled state
+  if (els.startAuctionBtn) els.startAuctionBtn.style.display = '';
+  if (els.endAuctionBtn) els.endAuctionBtn.style.display = '';
+  if (pauseBtn) pauseBtn.style.display = '';
+
   if (status === 'live') {
     els.startAuctionBtn.disabled = true;
     els.endAuctionBtn.disabled = false;
