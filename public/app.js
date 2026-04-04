@@ -185,6 +185,7 @@ const state = {
   roomId:      null,
   role:        null,
   teamId:      null,
+  name:        null,
   room:        null,
   selectedXI:  new Set(),
   selectedImpact: null,
@@ -1163,6 +1164,7 @@ on(els.pauseAuctionBtn, "click", () => {
 on(els.endAuctionBtn, "click", () => {
   const ok = window.confirm("End auction now and move all teams to Playing XI submission?");
   if (!ok) return;
+  localStorage.removeItem("auction_session");
   socket.emit("end_auction");
 });
 
@@ -1372,6 +1374,15 @@ socket.on("room_joined", ({ roomId, role, teamId, shareLink }) => {
   state.selectedXI = new Set();
   state.selectedImpact = null;
 
+  // Capture name from input (may be empty on auto-rejoin, fall back to existing state.name)
+  const inputName = els.nameInput?.value?.trim();
+  if (inputName) state.name = inputName;
+
+  // Persist session so page refresh can auto-rejoin
+  localStorage.setItem("auction_session", JSON.stringify({
+    roomId, role, teamId, name: state.name || ""
+  }));
+
   els.roomInput.value = roomId;
   if (els.shareLinkInput) els.shareLinkInput.value = shareLink;
   loadShareUrls(roomId, shareLink);
@@ -1392,6 +1403,8 @@ socket.on("room_joined", ({ roomId, role, teamId, shareLink }) => {
 
 socket.on("join_error", msg => {
   setJoinMessage(msg || "Failed to join room. Check the code.");
+  // Clear stale session
+  localStorage.removeItem("auction_session");
   // Clear stale room code from URL so user isn't stuck
   const url = new URL(window.location.href);
   if (url.searchParams.has("room")) {
@@ -1429,6 +1442,27 @@ socket.on("room_state", roomState => {
 socket.on("connect_error", () => {
   const target = socketServerUrl || window.location.origin;
   setJoinMessage(`Connection failed. Ensure server is running at ${target}, then refresh.`);
+});
+
+socket.on("connect", () => {
+  // Auto-rejoin if we have a saved session (e.g. after page refresh)
+  const raw = localStorage.getItem("auction_session");
+  if (!raw) return;
+  try {
+    const session = JSON.parse(raw);
+    if (!session?.roomId || !session?.name) return;
+    // Pre-load name into state so room_joined can persist it correctly
+    state.name = session.name;
+    setJoinMessage("Reconnecting to room…", false);
+    socket.emit("rejoin_room", {
+      roomId: session.roomId,
+      participantName: session.name,
+      teamId: session.teamId || null,
+      role: session.role || "spectator"
+    });
+  } catch (e) {
+    localStorage.removeItem("auction_session");
+  }
 });
 
 /* ══════════════════════════════════════════════════

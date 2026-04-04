@@ -1245,6 +1245,74 @@ io.on("connection", socket => {
     broadcastState(room);
   });
 
+  /* ── rejoin_room ── */
+  socket.on("rejoin_room", ({ roomId, participantName, teamId, role }) => {
+    const room = rooms.get((roomId || "").trim().toUpperCase());
+    if (!room) { socket.emit("join_error", "Room not found. Session expired or room was closed."); return; }
+
+    const cleanedName = (participantName || "").trim();
+
+    // Restore host session: name must match and host slot must be vacant (disconnected)
+    if (role === "host" && room.hostName === cleanedName && !room.hostSocketId) {
+      room.hostSocketId = socket.id;
+      room.participants[socket.id] = { name: cleanedName, role: "host", teamId: teamId || null };
+      socket.join(room.roomId);
+      socket.data.roomId = room.roomId;
+
+      // Restore team ownership if host had a team
+      if (teamId) {
+        const team = room.teams.find(t => t.id === teamId);
+        if (team && !team.ownerSocketId) {
+          team.ownerSocketId = socket.id;
+          team.ownerName = cleanedName;
+        }
+      }
+
+      pushLog(room, `${cleanedName} (host) reconnected.`);
+      const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+      socket.emit("room_joined", { roomId: room.roomId, role: "host", teamId: teamId || null, shareLink });
+      broadcastState(room);
+      return;
+    }
+
+    // Restore team-owner session: match by name + teamId, slot must be vacant
+    if (role === "team-owner" && teamId) {
+      const team = room.teams.find(t => t.id === teamId);
+      if (!team) { socket.emit("join_error", "Team not found."); return; }
+
+      // Allow rejoin if slot is vacant and name matches the stored owner name
+      if (team.ownerSocketId && team.ownerSocketId !== socket.id) {
+        socket.emit("join_error", `${team.name} is already taken by another player.`);
+        return;
+      }
+
+      if (team.ownerName && team.ownerName !== cleanedName && team.ownerSocketId) {
+        socket.emit("join_error", `${team.name} is already taken.`);
+        return;
+      }
+
+      team.ownerSocketId = socket.id;
+      team.ownerName = cleanedName;
+      room.participants[socket.id] = { name: cleanedName, role: "team-owner", teamId };
+      socket.join(room.roomId);
+      socket.data.roomId = room.roomId;
+
+      pushLog(room, `${cleanedName} reconnected to ${team.name}.`);
+      const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+      socket.emit("room_joined", { roomId: room.roomId, role: "team-owner", teamId, shareLink });
+      broadcastState(room);
+      return;
+    }
+
+    // Spectator rejoin
+    room.participants[socket.id] = { name: cleanedName, role: "spectator", teamId: null };
+    socket.join(room.roomId);
+    socket.data.roomId = room.roomId;
+    const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+    socket.emit("room_joined", { roomId: room.roomId, role: "spectator", teamId: null, shareLink });
+    broadcastState(room);
+  });
+
   /* ── disconnect ── */
   socket.on("disconnect", () => {
     const room = getParticipantRoom(socket);
@@ -1255,20 +1323,29 @@ io.on("connection", socket => {
 
     if (participant?.role === "team-owner" && participant.teamId) {
       const team = room.teams.find(t => t.id === participant.teamId);
-      if (team) { team.ownerSocketId = null; team.ownerName = "Vacant"; }
-      pushLog(room, `${participant.name} disconnected. Team slot is now vacant.`);
+      // Keep ownerName so rejoin can match, but clear socketId
+      if (team) { team.ownerSocketId = null; }
+      pushLog(room, `${participant.name} disconnected. Waiting for reconnect…`);
     }
 
     if (socket.id === room.hostSocketId) {
-      const nextId = Object.keys(room.participants)[0] || null;
-      room.hostSocketId = nextId;
-      room.hostName     = nextId ? room.participants[nextId].name : "No Host";
-      if (nextId) room.participants[nextId].role = "host";
-      pushLog(room, `Host disconnected. New host: ${room.hostName}.`);
+      // Keep hostName so rejoin can match; only reassign if no reconnect
+      room.hostSocketId = null;
+      // Also clear team ownership if host owned a team
+      if (participant?.teamId) {
+        const team = room.teams.find(t => t.id === participant.teamId);
+        if (team) { team.ownerSocketId = null; }
+      }
+      pushLog(room, `Host (${room.hostName}) disconnected. Waiting for reconnect…`);
     }
 
     if (Object.keys(room.participants).length === 0) {
-      rooms.delete(room.roomId);
+      // Give a grace period before deleting the room so reconnects work
+      setTimeout(() => {
+        if (rooms.has(room.roomId) && Object.keys(room.participants).length === 0) {
+          rooms.delete(room.roomId);
+        }
+      }, 30000); // 30 second grace period
       return;
     }
     broadcastState(room);
