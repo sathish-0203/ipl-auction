@@ -188,8 +188,9 @@
         <div id="auctionProgressText" class="badge-pill" style="font-size:0.8rem;">0 / 0 players</div>
       </div>
 
-      <div id="hostControls" class="hidden" style="margin-bottom:16px;">
-        <div class="row" style="gap:10px;flex-wrap:wrap;padding:16px;background:rgba(245,166,35,0.06);border-radius:14px;border:1px solid rgba(245,166,35,0.15);">
+      <!-- Host Controls (only visible to host) -->
+      <div id="hostControls" class="hidden auctionCard">
+        <div class="host-controls-row">
           <button id="startAuctionBtn" class="accent">
             <i class="fa-solid fa-play"></i> Start Auction
           </button>
@@ -202,7 +203,8 @@
           <button id="evaluateBtn" class="btn-eval">
             <i class="fa-solid fa-chart-bar"></i> Evaluate Rankings
           </button>
-          <div class="row" style="gap:8px; margin-left:auto;">
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+            <label for="timerSelect" style="font-size:0.92rem;color:var(--muted);margin-right:4px;">Timer</label>
             <select id="timerSelect" style="width:90px;padding:8px 10px;" aria-label="Auction timer seconds" title="Auction timer seconds">
               <option value="5">5s</option>
               <option value="10" selected>10s</option>
