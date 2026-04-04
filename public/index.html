@@ -183,10 +183,7 @@
         </a>
       </div>
       <div id="postAuctionActions" class="row hidden" style="margin-top:14px;gap:10px;flex-wrap:wrap;">
-        <button id="goPlaying11Btn" class="accent">
-          <i class="fa-solid fa-clipboard-list"></i> Make Playing XI
-        </button>
-        <span class="small">After auction, submit 11 players to analyze and rank teams.</span>
+        <span class="small">Select your 11 players. Rankings will auto-generate when all teams submit.</span>
       </div>
     </section>
 
@@ -210,9 +207,6 @@
           </button>
           <button id="endAuctionBtn" class="btn-sold">
             <i class="fa-solid fa-flag-checkered"></i> End Auction
-          </button>
-          <button id="evaluateBtn" class="btn-eval">
-            <i class="fa-solid fa-chart-bar"></i> Evaluate Rankings
           </button>
           <div class="row" style="gap:8px; margin-left:auto;">
             <select id="timerSelect" style="width:90px;padding:8px 10px;" aria-label="Auction timer seconds" title="Auction timer seconds">
@@ -359,21 +353,7 @@
       <p id="playing11Message" class="message"></p>
     </section>
 
-    <!-- ══════ AI ANALYSIS ══════ -->
-    <section class="card hidden" id="aiCard">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-robot"></i> AI Squad Analysis</h2>
-      </div>
-      <div id="aiSquadPreview" style="margin-bottom:14px;"></div>
-      <button id="analyzeBtn" class="accent">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI
-      </button>
-      <div id="aiResult" class="hidden" style="margin-top:16px;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;" id="aiScoreBar"></div>
-        <div id="aiCommentary" style="font-size:0.9rem;color:var(--ink-dim);line-height:1.7;white-space:pre-wrap;background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);"></div>
-      </div>
-      <p id="aiMessage" class="message"></p>
-    </section>
+
 
     <!-- ══════ RANKINGS ══════ -->
     <section class="card hidden" id="rankingsCard">
@@ -381,12 +361,7 @@
         <h2><i class="fa-solid fa-trophy"></i> Team Rankings</h2>
       </div>
       <div id="rankingsTable"></div>
-      <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
-        <button id="bestTeamAiBtn" class="accent">
-          <i class="fa-solid fa-brain"></i> AI Evaluate Best Team
-        </button>
-        <p id="bestTeamAiMsg" class="message" style="margin-top:8px;"></p>
-      </div>
+
     </section>
 
     <!-- ══════ LIVE FEED ══════ -->

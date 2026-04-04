@@ -122,7 +122,6 @@ const els = {
   evaluateBtn:       document.getElementById("evaluateBtn"),
   timerSelect:       document.getElementById("timerSelect"),
   postAuctionActions: document.getElementById("postAuctionActions"),
-  goPlaying11Btn:    document.getElementById("goPlaying11Btn"),
 
   // Lot box
   lotBox:           document.getElementById("lotBox"),
@@ -193,7 +192,10 @@ const state = {
   chosenTeamId: null,   // team picked in selector before joining
   shareLink:   "",
   timerMax:    10,
-  isOptimisticLoading: false
+  isOptimisticLoading: false,
+  hasAutoScrolledToPlaying11: false,
+  hasAutoScrolledToRankings: false,
+  prevRoomStatus: null,
 };
 
 /* ══════════════════════════════════════════════════
@@ -832,7 +834,6 @@ function renderPlaying11Selection() {
   const ended   = state.room?.status === "ended";
 
   els.playing11Card.classList.toggle("hidden", !(isOwner && ended));
-  els.aiCard.classList.toggle("hidden", !(isOwner && ended));
   if (els.postAuctionActions) {
     els.postAuctionActions.classList.toggle("hidden", !(isOwner && ended));
   }
@@ -840,6 +841,12 @@ function renderPlaying11Selection() {
   if (!(isOwner && ended)) return;
   const team  = myTeam();
   const squad = team ? team.squad : [];
+
+  if (team && !state.hasAutoScrolledToPlaying11 && !state.room?.playing11Submissions?.[team.id]) {
+    els.playing11Card.scrollIntoView({ behavior: "smooth", block: "start" });
+    state.hasAutoScrolledToPlaying11 = true;
+  }
+
   els.playing11List.innerHTML = "";
 
   if (state.selectedImpact && !squad.some(p => p.id === state.selectedImpact)) {
@@ -926,11 +933,12 @@ function renderRankings() {
   const rankings = state.room?.rankings;
   const visible  = Array.isArray(rankings) && rankings.length > 0;
   els.rankingsCard.classList.toggle("hidden", !visible);
-  if (els.bestTeamAiPanel) {
-    const canUseAi = visible && state.role === "host" && state.room?.status === "ended";
-    els.bestTeamAiPanel.classList.toggle("hidden", !canUseAi);
-  }
   if (!visible) return;
+
+  if (!state.hasAutoScrolledToRankings) {
+    els.rankingsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    state.hasAutoScrolledToRankings = true;
+  }
 
   els.rankingsTable.innerHTML = "";
   rankings.forEach(entry => {
@@ -1220,50 +1228,7 @@ on(els.startAuctionBtn, "click", () => {
   socket.emit("set_timer_duration", { duration: els.timerSelect.value });
   socket.emit("start_auction", { timerDuration: Number(els.timerSelect.value) });
 });
-on(els.evaluateBtn, "click", () => socket.emit("evaluate_rankings"));
 
-on(els.bestTeamAiBtn, "click", async () => {
-  if (!state.room?.rankings || !state.room.rankings.length) {
-    if (els.bestTeamAiMsg) els.bestTeamAiMsg.textContent = "No rankings available yet.";
-    return;
-  }
-
-  if (els.bestTeamAiMsg) {
-    els.bestTeamAiMsg.className = "message ok";
-    els.bestTeamAiMsg.textContent = "Evaluating best team with AI...";
-  }
-
-  try {
-    const res = await fetch("/api/analyze-rankings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rankings: state.room.rankings })
-    });
-    const data = await res.json();
-    if (data.error) {
-      if (els.bestTeamAiMsg) {
-        els.bestTeamAiMsg.className = "message";
-        els.bestTeamAiMsg.textContent = data.error;
-      }
-      return;
-    }
-
-    if (els.bestTeamAiMsg) {
-      els.bestTeamAiMsg.className = "message ok";
-      els.bestTeamAiMsg.textContent = `Best Team: ${data.bestTeam}. ${data.summary}`;
-    }
-  } catch (e) {
-    if (els.bestTeamAiMsg) {
-      els.bestTeamAiMsg.className = "message";
-      els.bestTeamAiMsg.textContent = "AI evaluation failed. Try again.";
-    }
-  }
-});
-if (els.goPlaying11Btn) {
-  on(els.goPlaying11Btn, "click", () => {
-    els.playing11Card?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-}
 
 on(els.impactPlayerSelect, "change", () => {
   const team = myTeam();
@@ -1322,55 +1287,6 @@ on(els.submitXIBtn, "click", () => {
     impactPlayerId: state.selectedImpact || null,
   });
 });
-
-/* ── AI Analyse ── */
-if (els.analyzeBtn) {
-  on(els.analyzeBtn, "click", async () => {
-    const team = myTeam();
-    if (!team) return;
-    if (state.selectedXI.size !== 11) {
-      setAiMessage("Submit your Playing XI first.");
-      return;
-    }
-    const xi = [...state.selectedXI].map(id => team.squad.find(p => p.id === id)).filter(Boolean);
-    if (xi.length !== 11) { setAiMessage("Could not resolve all 11 players."); return; }
-    const impactPlayer = state.selectedImpact
-      ? team.squad.find(p => p.id === state.selectedImpact) || null
-      : null;
-
-    els.analyzeBtn.disabled = true;
-    els.analyzeBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analysing…`;
-    setAiMessage("", false);
-
-    try {
-      const res = await fetch("/api/analyze-xi", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          teamId: state.teamId,
-          teamName: team.name,
-          players: xi,
-          impactPlayer,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) { setAiMessage(data.error); }
-      else {
-        els.aiResult.classList.remove("hidden");
-        els.aiCommentary.textContent = data.commentary;
-        const cfg = teamConfig(state.teamId);
-        els.aiScoreBar.innerHTML = (data.grades || []).map((g, i) =>
-          `<span class="badge-pill" style="${i===0?`background:${cfg.primary}22;color:${cfg.primary};border-color:${cfg.primary}44`:""}">${g}</span>`
-        ).join(" ");
-      }
-    } catch (e) {
-      setAiMessage("Analysis failed. Try again.");
-    } finally {
-      els.analyzeBtn.disabled = false;
-      els.analyzeBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI`;
-    }
-  });
-}
 
 /* ══════════════════════════════════════════════════
    SOCKET STATE SYNC
@@ -1442,11 +1358,22 @@ socket.on("playing11_error", msg => {
 socket.on("room_state", roomState => {
   state.isOptimisticLoading = false; // Server has synced back
   const prevLotId = state.room?.currentLot?.id;
+  const previousStatus = state.room?.status || state.prevRoomStatus;
   state.room = roomState;
+
   // Reset skip button label when lot changes
   if (els.skipPlayerBtn && roomState.currentLot?.id !== prevLotId) {
     els.skipPlayerBtn.innerHTML = `<i class="fa-solid fa-forward-step"></i> Skip`;
   }
+
+  if (previousStatus !== state.room.status) {
+    if (state.room.status === "live") {
+      state.hasAutoScrolledToPlaying11 = false;
+      state.hasAutoScrolledToRankings = false;
+    }
+    state.prevRoomStatus = state.room.status;
+  }
+
   if (els.timerSelect && Number.isFinite(Number(roomState.timerDuration))) {
     els.timerSelect.value = String(roomState.timerDuration);
   }
