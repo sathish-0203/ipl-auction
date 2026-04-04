@@ -1166,6 +1166,17 @@ io.on("connection", socket => {
     finalizeLot(room, action);
   });
 
+  /* ── skip_player ── */
+  socket.on("skip_player", () => {
+    const room = getParticipantRoom(socket);
+    if (!room || !assertHost(socket, room) || room.status !== "live" || !room.currentLot) return;
+    stopTimer(room);
+    const skippedName = room.currentLot.name;
+    finalizeLot(room, "unsold");
+    pushLog(room, `⏭️ ${skippedName} was skipped by host.`);
+    broadcastState(room);
+  });
+
   /* ── submit_playing11 ── */
   socket.on("submit_playing11", ({ playerIds, impactPlayerId }) => {
     const room = getParticipantRoom(socket);

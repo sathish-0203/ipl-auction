@@ -117,6 +117,7 @@ const els = {
   hostControls:      document.getElementById("hostControls"),
   startAuctionBtn:   document.getElementById("startAuctionBtn"),
   pauseAuctionBtn:   document.getElementById("pauseAuctionBtn"),
+  skipPlayerBtn:     document.getElementById("skipPlayerBtn"),
   endAuctionBtn:     document.getElementById("endAuctionBtn"),
   evaluateBtn:       document.getElementById("evaluateBtn"),
   timerSelect:       document.getElementById("timerSelect"),
@@ -753,7 +754,6 @@ function renderTeams() {
     const spent = PURSE_START - team.purse;
     const pct = Math.max(0, Math.min(100, (team.purse / PURSE_START) * 100));
     const overseasCount = team.squad.filter((p) => p.overseas).length;
-    const recentPlayers = [...team.squad].slice(-6).reverse();
 
     const card = document.createElement("article");
     card.className = "squad-card";
@@ -765,32 +765,32 @@ function renderTeams() {
           <p>${team.name}</p>
           <p style="font-size:0.72rem;color:var(--muted)">${team.ownerName}</p>
         </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:0.78rem;font-weight:700;color:${cfg.primary}">${cr(team.purse)}</div>
+          <div style="font-size:0.68rem;color:var(--muted)">remaining</div>
+        </div>
       </div>
-      <div class="squad-purse-bar">
-        <span>Purse: <strong style="color:${cfg.primary}">${cr(team.purse)}</strong></span>
-        <span>Spent: ${cr(spent)}</span>
-      </div>
-      <div class="purse-track">
+      <div class="purse-track" style="margin-bottom:10px;">
         <div class="purse-fill" style="width:${pct}%;background:${cfg.primary}"></div>
       </div>
-      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;">
-        Squad: <strong>${team.squad.length}</strong> players · ✈️ Overseas <strong>${overseasCount}/8</strong>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:10px;">
+        <span>Spent: <strong style="color:var(--ink-dim)">${cr(spent)}</strong></span>
+        <span>Squad: <strong style="color:var(--ink-dim)">${team.squad.length}</strong></span>
+        <span>✈️ <strong style="color:var(--ink-dim)">${overseasCount}/8</strong></span>
       </div>
       <div class="squad-player-list">
-        ${recentPlayers.length === 0
+        ${team.squad.length === 0
           ? `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:8px 0">No players yet</div>`
-          : recentPlayers.map(p => `
+          : team.squad.map(p => `
             <div class="squad-player-row">
               <span class="squad-player-name">
-                ${p.name}
-                ${p.overseas ? `<span class="overseas-flag">✈️</span>` : ""}
+                ${p.name}${p.overseas ? ` <span class="overseas-flag">✈️</span>` : ""}
               </span>
-              <div style="display:flex;gap:6px;align-items:center">
+              <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
                 <span class="pill-role role-${roleClass(p.role)}">${roleShort(p.role)}</span>
                 <span class="squad-player-price">${cr(p.soldPrice)}</span>
               </div>
             </div>`).join("")}
-        ${team.squad.length > 6 ? `<div style="text-align:center;color:var(--muted);font-size:0.72rem;padding:4px">+${team.squad.length - 6} more</div>` : ""}
       </div>
     `;
     els.teamsGrid.appendChild(card);
@@ -1055,6 +1055,9 @@ function render() {
   if (els.endAuctionBtn) {
     els.endAuctionBtn.disabled = state.room.status !== "live";
   }
+  if (els.skipPlayerBtn) {
+    els.skipPlayerBtn.disabled = state.room.status !== "live" || !state.room.currentLot || state.room.isPaused;
+  }
   
   const isLive = state.room.status === "live";
   
@@ -1159,6 +1162,13 @@ on(els.timerSelect, "change", () => {
 
 on(els.pauseAuctionBtn, "click", () => {
   socket.emit("pause_auction", { paused: !state.room?.isPaused });
+});
+
+on(els.skipPlayerBtn, "click", () => {
+  if (!state.room?.currentLot) return;
+  const name = state.room.currentLot.name;
+  if (!window.confirm(`Skip "${name}" and mark as unsold?`)) return;
+  socket.emit("skip_player");
 });
 
 on(els.endAuctionBtn, "click", () => {
@@ -1469,6 +1479,19 @@ socket.on("connect", () => {
    INIT
 ══════════════════════════════════════════════════ */
 buildTeamSelector();
+
+// Toggle teams grid visibility
+const toggleTeamsBtn = document.getElementById("toggleTeamsBtn");
+const toggleTeamsIcon = document.getElementById("toggleTeamsIcon");
+if (toggleTeamsBtn) {
+  toggleTeamsBtn.addEventListener("click", () => {
+    const grid = document.getElementById("teamsGrid");
+    const hidden = grid.style.display === "none";
+    grid.style.display = hidden ? "" : "none";
+    toggleTeamsIcon.className = hidden ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
+    toggleTeamsBtn.innerHTML = `<i class="${toggleTeamsIcon.className}" id="toggleTeamsIcon"></i> ${hidden ? "Hide" : "Show"}`;
+  });
+}
 
 // Tab switching for New Game / Join Room
 const tabNew = document.getElementById("tabNew");

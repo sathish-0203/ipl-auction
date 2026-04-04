@@ -208,6 +208,9 @@
           <button id="pauseAuctionBtn" class="btn-unsold">
             <i class="fa-solid fa-pause"></i> Pause Auction
           </button>
+          <button id="skipPlayerBtn" class="btn-eval">
+            <i class="fa-solid fa-forward-step"></i> Skip Player
+          </button>
           <button id="endAuctionBtn" class="btn-sold">
             <i class="fa-solid fa-flag-checkered"></i> End Auction
           </button>
@@ -287,7 +290,12 @@
     <section class="card hidden" id="teamsCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-shield-halved"></i> Teams &amp; Squads</h2>
-        <span class="badge-pill" id="teamsLiveChip"></span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="badge-pill" id="teamsLiveChip"></span>
+          <button id="toggleTeamsBtn" style="padding:6px 14px;font-size:0.8rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
+            <i class="fa-solid fa-chevron-up" id="toggleTeamsIcon"></i> Hide
+          </button>
+        </div>
       </div>
       <div id="teamsGrid" class="team-squads-grid"></div>
     </section>
