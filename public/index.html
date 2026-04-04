@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IPL Auction Arena — Live War Room</title>
+  <title>IPL Auction Arena — Live 10-Team Bidding</title>
+  <meta name="description" content="IPL Auction Arena: A live 10-team auction with 254 players, Playing XI intelligence, and transparent rankings." />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body class="wr-body">
+
+<body>
+  <!-- Animated background shapes -->
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
 
   <!-- ══════ SOLD / UNSOLD OVERLAY ══════ -->
   <div id="lotResultOverlay" class="lot-result-overlay hidden">
@@ -26,235 +32,190 @@
     </div>
   </div>
 
-  <!-- ══════ LANDING PAGE (pre-room) ══════ -->
-  <div id="landingPage">
-    <div class="wr-bg-grid"></div>
+  <main class="container">
 
-    <!-- Landing Header -->
-    <header class="wr-landing-header">
-      <div class="wr-landing-logo">
-        <span class="material-symbols-outlined" style="font-size:1.4rem;color:#97cbff;">sports_cricket</span>
-        <span>IPL AUCTION ARENA</span>
+    <!-- ══════ HERO BANNER ══════ -->
+    <header class="hero-banner">
+      <div class="hero-inner">
+        <div class="hero-badge">🏏 LIVE AUCTION PLATFORM</div>
+        <h1 class="hero-title">
+          <i class="fa-solid fa-cricket-bat-ball hero-icon"></i> IPL Auction Arena
+        </h1>
+        <p class="muted-text" style="margin-top:10px; font-size:1rem;">
+          10 teams · 254 players · Real-time bidding · Playing XI intelligence
+        </p>
+        <p class="hero-credit">Created by Viper</p>
       </div>
-      <p class="wr-landing-sub">10 TEAMS · 450 PLAYERS · REAL-TIME BIDDING</p>
     </header>
 
-    <!-- Landing Main -->
-    <main class="wr-landing-main">
+    <!-- ══════ FEATURES GRID ══════ -->
+    <section class="card features-section" id="featuresCard">
+      <h2 class="features-title">Why Play IPL Auction Game?</h2>
+      <p class="features-subtitle">Experience the thrill of being an IPL team owner. Build your dream squad with real auction mechanics.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+          <h3>Play with Friends</h3>
+          <p>Create private rooms and invite up to 10 friends. Each person becomes an IPL franchise owner.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h3>Real-Time Bidding</h3>
+          <p>Live auction with instant updates. Place bids, counter-bid, and compete for top players.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-crown"></i></div>
+          <h3>2026 Official Player List</h3>
+          <p>Updated with the uploaded full player dataset and real base prices.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-stopwatch"></i></div>
+          <h3>Authentic Timer System</h3>
+          <p>IPL-style countdown timer adds pressure and excitement to every bid decision.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+          <h3>Works on Any Device</h3>
+          <p>Play on mobile, tablet, or desktop. No app download needed — just open and play.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+          <h3>No Sign Up Required</h3>
+          <p>Jump straight into the action. No account needed — just enter your name and start.</p>
+        </div>
+      </div>
+    </section>
 
-      <!-- Features strip -->
-      <section id="featuresCard" class="wr-features-strip">
-        <div class="wr-feature-item">
-          <span class="material-symbols-outlined">group</span>
-          <span>Play with Friends</span>
-        </div>
-        <div class="wr-feature-item">
-          <span class="material-symbols-outlined">bolt</span>
-          <span>Real-Time Bidding</span>
-        </div>
-        <div class="wr-feature-item">
-          <span class="material-symbols-outlined">emoji_events</span>
-          <span>2026 Player List</span>
-        </div>
-        <div class="wr-feature-item">
-          <span class="material-symbols-outlined">timer</span>
-          <span>IPL-Style Timer</span>
-        </div>
-        <div class="wr-feature-item">
-          <span class="material-symbols-outlined">devices</span>
-          <span>Any Device</span>
-        </div>
-        <div class="wr-feature-item">
-          <span class="material-symbols-outlined">no_accounts</span>
-          <span>No Sign Up</span>
-        </div>
-      </section>
+    <!-- ══════ JOIN / CREATE — UNIFIED ══════ -->
+    <section class="card join-section" id="teamSelectCard">
+      <div class="join-tabs" id="joinTabs">
+        <button class="join-tab active" data-tab="new" id="tabNew"><i class="fa-solid fa-bolt"></i> New Game</button>
+        <button class="join-tab" data-tab="join" id="tabJoin"><i class="fa-solid fa-right-to-bracket"></i> Join Room</button>
+      </div>
 
-      <!-- Join Card -->
-      <section class="wr-join-card" id="teamSelectCard">
-        <div class="wr-join-tabs" id="joinTabs">
-          <button class="wr-join-tab active" id="tabNew">
-            <span class="material-symbols-outlined">add_circle</span> NEW GAME
-          </button>
-          <button class="wr-join-tab" id="tabJoin">
-            <span class="material-symbols-outlined">login</span> JOIN ROOM
-          </button>
-        </div>
+      <!-- NEW GAME TAB -->
+      <div class="join-tab-content active" id="tabContentNew">
+        <label class="join-label">
+          Your Name
+          <input id="nameInput" placeholder="Enter your name" autocomplete="off" />
+        </label>
 
-        <!-- NEW GAME TAB -->
-        <div class="wr-tab-content active" id="tabContentNew">
-          <label class="wr-label">
-            <span class="wr-label-text">CALL SIGN</span>
-            <input id="nameInput" class="wr-input" placeholder="Enter your name" autocomplete="off" />
-          </label>
-          <div class="wr-team-picker-label">SELECT YOUR FRANCHISE</div>
+        <div class="join-team-picker">
+          <label class="join-label" style="margin-bottom:8px;">Choose Your Team</label>
           <div class="team-circle-row" id="teamSelectGrid"></div>
-          <p id="teamSelectMsg" class="wr-msg"></p>
-          <div id="selectedTeamBadge" class="selected-team-badge hidden"></div>
-          <a href="/create-room.html" class="wr-btn-primary" style="text-decoration: none; display: inline-block; width: 100%; text-align: center;">
-            <span class="material-symbols-outlined">bolt</span> CREATE WAR ROOM
-          </a>
         </div>
+        <p id="teamSelectMsg" class="message" style="margin-top:4px;"></p>
+        <div id="selectedTeamBadge" class="selected-team-badge hidden" style="margin-top:8px;"></div>
 
-        <!-- JOIN ROOM TAB -->
-        <div class="wr-tab-content" id="tabContentJoin">
-          <label class="wr-label">
-            <span class="wr-label-text">CALL SIGN</span>
-            <input id="nameInputJoin" class="wr-input" placeholder="Enter your name" autocomplete="off" />
-          </label>
-          <label class="wr-label">
-            <span class="wr-label-text">ROOM CODE</span>
-            <input id="roomInput" class="wr-input" placeholder="e.g. A7K9QP" autocomplete="off" style="text-transform:uppercase;" />
-          </label>
-          <div class="wr-team-picker-label">SELECT YOUR FRANCHISE</div>
+        <button id="createBtn" class="accent create-room-btn">
+          <i class="fa-solid fa-bolt"></i> Create Room
+        </button>
+      </div>
+
+      <!-- JOIN ROOM TAB -->
+      <div class="join-tab-content" id="tabContentJoin">
+        <label class="join-label">
+          Your Name
+          <input id="nameInputJoin" placeholder="Enter your name" autocomplete="off" />
+        </label>
+        <label class="join-label">
+          Room Code
+          <input id="roomInput" placeholder="e.g. A7K9QP" autocomplete="off" style="text-transform:uppercase;" />
+        </label>
+
+        <div class="join-team-picker">
+          <label class="join-label" style="margin-bottom:8px;">Choose Your Team</label>
           <div class="team-circle-row" id="teamSelectGridJoin"></div>
-          <button id="joinBtn" class="wr-btn-secondary">
-            <span class="material-symbols-outlined">login</span> ENTER WAR ROOM
-          </button>
         </div>
 
-        <p id="joinMessage" class="wr-msg" style="text-align:center;margin-top:12px;"></p>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- Hidden dummy joinCard for app.js logic -->
-  <div id="joinCard" class="hidden"></div>
-
-  <!-- ══════ WAR ROOM (in-auction layout) ══════ -->
-  <div id="warRoom" class="wr-warroom hidden">
-    <div class="wr-bg-grid"></div>
-
-    <!-- Top Nav -->
-    <header class="wr-topnav">
-      <div class="wr-topnav-left">
-        <span class="wr-room-name" id="roomCodeText">ARENA_ROOM</span>
-        <nav class="wr-topnav-nav">
-          <a class="wr-topnav-link active" href="#">WAR ROOM</a>
-        </nav>
+        <button id="joinBtn" class="accent create-room-btn" style="background:rgba(255,255,255,0.1);color:var(--ink);border:1px solid var(--accent);">
+          <i class="fa-solid fa-right-to-bracket"></i> Join Room
+        </button>
       </div>
-      <div class="wr-topnav-right">
-        <!-- Purse chip -->
-        <div id="myPurseChip" class="wr-purse-chip" style="display:none;">
-          <span class="material-symbols-outlined" style="font-size:1rem;">wallet</span>
-          <span id="myPurseText">₹120 Cr</span>
+
+      <p id="joinMessage" class="message" style="text-align:center;"></p>
+    </section>
+
+    <!-- Hidden dummy joinCard for app.js hide/show logic -->
+    <div id="joinCard" class="hidden"></div>
+
+    <!-- ══════ ROOM INFO ══════ -->
+    <section class="card hidden" id="roomCard">
+      <div class="row between" style="flex-wrap:wrap; gap:16px;">
+        <div>
+          <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;color:#fff;">
+            <i class="fa-solid fa-users" style="color:var(--accent);margin-right:8px;"></i>
+            Room <span id="roomCodeText" style="color:var(--accent);letter-spacing:0.08em;"></span>
+          </h2>
+          <p id="identityText" style="margin-top:4px;font-size:0.92rem;color:var(--ink-dim);"></p>
         </div>
-        <!-- Status chip -->
-        <div id="statusChip" class="wr-status-chip">
-          <span class="wr-live-dot"></span>
-          <span id="statusText">Lobby</span>
-        </div>
-        <!-- Host controls inline -->
-        <div id="hostControls" class="wr-host-controls hidden">
-          <button id="startAuctionBtn" class="wr-btn-start">
-            <span class="material-symbols-outlined" style="font-size:1rem;">play_arrow</span> START
-          </button>
-          <button id="pauseAuctionBtn" class="wr-btn-pause">
-            <span class="material-symbols-outlined" style="font-size:1rem;">pause</span> PAUSE
-          </button>
-          <button id="endAuctionBtn" class="wr-btn-end">
-            <span class="material-symbols-outlined" style="font-size:1rem;">stop</span> END
-          </button>
-          <button id="evaluateBtn" class="wr-btn-eval">
-            <span class="material-symbols-outlined" style="font-size:1rem;">bar_chart</span> RANK
-          </button>
-          <select id="timerSelect" class="wr-timer-select" aria-label="Timer" title="Timer duration">
-            <option value="5">5s</option>
-            <option value="10" selected>10s</option>
-            <option value="15">15s</option>
-            <option value="20">20s</option>
-            <option value="30">30s</option>
-            <option value="45">45s</option>
-            <option value="60">60s</option>
-          </select>
-        </div>
-        <!-- Identity -->
-        <div class="wr-identity-chip">
-          <span class="material-symbols-outlined" style="font-size:1rem;">person</span>
-          <span id="identityText" style="font-size:0.75rem;font-weight:700;letter-spacing:0.05em;"></span>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div id="myPurseChip" class="purse-chip" style="display:none;">
+            <i class="fa-solid fa-wallet"></i>
+            Purse: <strong id="myPurseText">₹120 Cr</strong>
+          </div>
+          <span id="statusChip" class="status-chip">
+            <i class="fa-solid fa-satellite-dish"></i>
+            <span id="statusText">Lobby</span>
+          </span>
         </div>
       </div>
-    </header>
+      <div class="row" style="margin-top:16px; gap:10px; flex-wrap:wrap;">
+        <p class="small"><i class="fa-solid fa-share-nodes" style="color:var(--accent);margin-right:4px;"></i>Share Link:</p>
+        <input id="shareLinkInput" readonly title="Share room link" style="flex:1;min-width:200px;font-size:0.82rem;" />
+        <button id="copyLinkBtn" style="padding:8px 14px;font-size:0.82rem;">
+          <i class="fa-solid fa-copy"></i> Copy
+        </button>
+      </div>
+      <div id="shareApps" class="share-apps-row hidden">
+        <span class="small">Share via:</span>
+        <a id="shareWhatsapp" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
+        <a id="shareTelegram" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-telegram"></i> Telegram
+        </a>
+        <a id="shareTwitter" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-x-twitter"></i> X
+        </a>
+        <a id="shareEmail" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-envelope"></i> Email
+        </a>
+      </div>
+      <div id="postAuctionActions" class="row hidden" style="margin-top:14px;gap:10px;flex-wrap:wrap;">
+        <button id="goPlaying11Btn" class="accent">
+          <i class="fa-solid fa-clipboard-list"></i> Make Playing XI
+        </button>
+        <span class="small">After auction, submit 11 players to analyze and rank teams.</span>
+      </div>
+    </section>
 
-    <!-- Body: sidebar + main -->
-    <div class="wr-body-layout">
+    <!-- ══════ AUCTION DESK ══════ -->
+    <section class="card hidden" id="auctionCard">
+      <div class="row between" style="flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;color:#fff;">
+          <i class="fa-solid fa-gavel" style="color:var(--accent);margin-right:8px;"></i>Auction Desk
+        </h2>
+        <div id="auctionProgressText" class="badge-pill" style="font-size:0.8rem;">0 / 0 players</div>
+      </div>
 
-      <!-- Sidebar: Teams -->
-      <aside class="wr-sidebar">
-        <div class="wr-sidebar-header">
-          <div class="wr-sidebar-title-row">
-            <span class="wr-live-dot"></span>
-            <span class="wr-sidebar-label">ACTIVE TEAMS</span>
-          </div>
-          <div class="wr-sidebar-count" id="teamsLiveChip">10/10 PRESENT</div>
-        </div>
-        <div class="wr-sidebar-teams" id="teamsGrid"></div>
-        <!-- Share section in sidebar -->
-        <div class="wr-sidebar-share">
-          <div class="wr-share-row">
-            <input id="shareLinkInput" class="wr-share-input" readonly title="Share room link" />
-            <button id="copyLinkBtn" class="wr-copy-btn" title="Copy link">
-              <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span>
-            </button>
-          </div>
-          <div id="shareApps" class="wr-share-apps hidden">
-            <a id="shareWhatsapp" class="wr-share-app" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i></a>
-            <a id="shareTelegram" class="wr-share-app" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i></a>
-            <a id="shareTwitter" class="wr-share-app" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i></a>
-            <a id="shareEmail" class="wr-share-app" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-envelope"></i></a>
-          </div>
-        </div>
-
-        <!-- Live Chat -->
-        <div class="wr-sidebar-chat">
-          <div class="wr-chat-header">
-            <span class="material-symbols-outlined" style="font-size:1rem;">chat</span>
-            <span class="wr-chat-label">LIVE CHAT</span>
-          </div>
-          <div class="wr-chat-messages" id="chatBox"></div>
-          <div class="wr-chat-input-row">
-            <input id="chatInput" class="wr-chat-input" type="text" placeholder="Type message..." maxlength="100" />
-            <button id="chatSendBtn" class="wr-chat-send-btn" title="Send message">
-              <span class="material-symbols-outlined">send</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main content -->
-      <main class="wr-main">
-
-        <!-- Auction Deck Controls -->
-        <section class="wr-auction-deck" id="auctionDeckCard">
-          <div class="wr-deck-header">
-            <div class="wr-deck-title">
-              <span class="material-symbols-outlined" style="font-size:1.3rem;color:#ffdb3c;">local_activity</span>
-              AUCTION DECK
-            </div>
-            <button id="autoPlayToggle" class="wr-deck-auto-toggle" title="Auto-play next player">
-              <span class="material-symbols-outlined">auto_awesome</span>
-            </button>
-          </div>
-          <div class="wr-deck-actions">
-            <button id="deckStartBtn" class="wr-deck-btn start-btn" title="Start the auction">
-              <span class="material-symbols-outlined">play_arrow</span>
-              <span>START</span>
-            </button>
-            <button id="deckPauseBtn" class="wr-deck-btn pause-btn" title="Pause the auction">
-              <span class="material-symbols-outlined">pause</span>
-              <span>PAUSE</span>
-            </button>
-            <button id="deckSkipBtn" class="wr-deck-btn skip-btn" title="Skip current player">
-              <span class="material-symbols-outlined">skip_next</span>
-              <span>SKIP</span>
-            </button>
-            <button id="deckEndBtn" class="wr-deck-btn end-btn" title="End the auction">
-              <span class="material-symbols-outlined">stop</span>
-              <span>END</span>
-            </button>
-            <div class="wr-deck-divider"></div>
-            <select id="deckTimerSelect" class="wr-deck-select" title="Select timer duration">
+      <!-- Host Controls (only visible to host) -->
+      <div id="hostControls" class="hidden" style="margin-bottom:16px;">
+        <div class="row" style="gap:10px;flex-wrap:wrap;padding:16px;background:rgba(245,166,35,0.06);border-radius:14px;border:1px solid rgba(245,166,35,0.15);">
+          <button id="startAuctionBtn" class="accent">
+            <i class="fa-solid fa-play"></i> Start Auction
+          </button>
+          <button id="pauseAuctionBtn" class="btn-unsold">
+            <i class="fa-solid fa-pause"></i> Pause Auction
+          </button>
+          <button id="endAuctionBtn" class="btn-sold">
+            <i class="fa-solid fa-flag-checkered"></i> End Auction
+          </button>
+          <button id="evaluateBtn" class="btn-eval">
+            <i class="fa-solid fa-chart-bar"></i> Evaluate Rankings
+          </button>
+          <div class="row" style="gap:8px; margin-left:auto;">
+            <select id="timerSelect" style="width:90px;padding:8px 10px;" aria-label="Auction timer seconds" title="Auction timer seconds">
               <option value="5">5s</option>
               <option value="10" selected>10s</option>
               <option value="15">15s</option>
@@ -263,230 +224,185 @@
               <option value="45">45s</option>
               <option value="60">60s</option>
             </select>
-            <button id="deckEvaluateBtn" class="wr-deck-btn eval-btn" title="Evaluate and rank teams">
-              <span class="material-symbols-outlined">bar_chart</span>
-              <span>RANK</span>
-            </button>
           </div>
-        </section>
+        </div>
+      </div>
 
-        <!-- Upcoming queue strip -->
-        <section class="wr-queue-strip" id="marketWatchCard">
-          <div class="wr-queue-header">
-            <span class="wr-section-label">UPCOMING IN QUEUE</span>
-            <span id="auctionProgressText" class="wr-progress-label">0 / 0 players</span>
-          </div>
-          <div class="wr-queue-scroll">
-            <div id="upcomingList" class="wr-queue-list"></div>
-          </div>
-          <!-- Sold / Unsold trackers collapsed -->
-          <div class="wr-tracker-row">
-            <div class="wr-tracker-col">
-              <span class="wr-tracker-label">SOLD</span>
-              <div id="soldList" class="wr-tracker-list"></div>
-            </div>
-            <div class="wr-tracker-col">
-              <span class="wr-tracker-label">UNSOLD</span>
-              <div id="unsoldList" class="wr-tracker-list"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Auction split: player card + bid center -->
-        <div class="wr-auction-split" id="auctionCard">
-
-          <!-- Left: Current player -->
-          <div class="wr-player-panel">
-            <!-- Timer -->
-            <div class="timer-container hidden" id="timerContainer">
-              <svg class="timer-ring" viewBox="0 0 100 100">
-                <circle class="timer-ring-bg" cx="50" cy="50" r="45"/>
-                <circle class="timer-ring-fill" id="timerRingFill" cx="50" cy="50" r="45"/>
-              </svg>
-              <span class="timer-text" id="timerText">10</span>
-            </div>
-
-            <div class="wr-player-meta-top">
-              <span class="wr-live-hammer">
-                <span class="material-symbols-outlined" style="font-size:1rem;color:#ffdb3c;">gavel</span>
-                LIVE UNDER HAMMER
-              </span>
-              <span id="playerBadge" class="player-role-badge"></span>
-            </div>
-
-            <h1 id="playerName" class="wr-player-name">No player on the lot</h1>
-            <p id="playerMeta" class="wr-player-submeta"></p>
-
-            <div class="wr-player-stats">
-              <div class="wr-stat accent-stat">
-                <div class="stat-label">Base Price</div>
-                <div class="stat-value" id="basePriceText">—</div>
-              </div>
-              <div class="wr-stat">
-                <div class="stat-label">Rating</div>
-                <div class="stat-value" id="playerRatingText">—</div>
-              </div>
-              <div class="wr-stat">
-                <div class="stat-label">Type</div>
-                <div class="stat-value" id="playerTypeText" style="font-size:0.9rem;">—</div>
-              </div>
-              <div class="wr-stat">
-                <div class="stat-label">Highest Bid</div>
-                <div id="highestBidText" class="stat-value">—</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Bid center -->
-          <div class="wr-bid-panel hidden" id="bidCard">
-            <div class="wr-bid-header">
-              <div>
-                <div class="wr-bid-label">CURRENT HIGHEST BID</div>
-                <div class="wr-bid-amount" id="highestBidDisplay">—</div>
-              </div>
-              <button id="skipPlayerBtn" class="wr-skip-btn" title="Vote to skip this player">
-                <span class="material-symbols-outlined" style="font-size:1rem;">skip_next</span> SKIP
-              </button>
-            </div>
-
-            <button id="quickBidBtn" class="wr-place-bid-btn">
-              <span><span class="material-symbols-outlined" style="font-size:1.2rem;">bolt</span> PLACE BID</span>
-              <span id="quickBidAmount" class="wr-bid-amount-tag">₹—</span>
-            </button>
-
-            <!-- Quick Bid Presets -->
-            <div class="wr-quick-bid-presets">
-              <div class="wr-presets-label">Quick Bids</div>
-              <div class="wr-presets-buttons">
-                <button id="presetBid1" class="wr-preset-btn" data-multiplier="1">
-                  <span class="preset-amount" id="preset1Text">₹0.50 Cr</span>
-                  <span class="preset-label">LOW</span>
-                </button>
-                <button id="presetBid2" class="wr-preset-btn" data-multiplier="2">
-                  <span class="preset-amount" id="preset2Text">₹0.75 Cr</span>
-                  <span class="preset-label">MID</span>
-                </button>
-                <button id="presetBid3" class="wr-preset-btn" data-multiplier="3">
-                  <span class="preset-amount" id="preset3Text">₹1.00 Cr</span>
-                  <span class="preset-label">HIGH</span>
-                </button>
-              </div>
-            </div>
-
-            <p id="bidMessage" class="wr-bid-msg"></p>
-
-            <!-- Bid history / logs inline -->
-            <div class="wr-bid-history">
-              <div class="wr-bid-history-label">
-                <span class="material-symbols-outlined" style="font-size:0.9rem;">history</span> BIDDING HISTORY
-              </div>
-              <div id="logsBox" class="wr-logs custom-scrollbar"></div>
-            </div>
-          </div>
-
-          <!-- Waiting state (no bid card) -->
-          <div class="wr-waiting-panel" id="waitingPanel">
-            <span class="material-symbols-outlined" style="font-size:3rem;color:#404750;">gavel</span>
-            <p class="wr-waiting-text">Waiting for auction to start…</p>
-          </div>
-
+      <!-- Player LOT box -->
+      <div class="lot-box" id="lotBox" style="position:relative;">
+        <!-- Timer ring -->
+        <div class="timer-container hidden" id="timerContainer">
+          <svg class="timer-ring" viewBox="0 0 100 100">
+            <circle class="timer-ring-bg" cx="50" cy="50" r="45"/>
+            <circle class="timer-ring-fill" id="timerRingFill" cx="50" cy="50" r="45"/>
+          </svg>
+          <span class="timer-text" id="timerText">10</span>
         </div>
 
-        <!-- Post auction actions -->
-        <div id="postAuctionActions" class="wr-post-auction hidden">
-          <div class="wr-post-actions-row">
-            <button id="goPlaying11Btn" class="wr-btn-primary">
-              <span class="material-symbols-outlined">clipboard</span> MAKE PLAYING XI
-            </button>
-            <button id="exportCsvBtn" class="wr-btn-secondary">
-              <span class="material-symbols-outlined">download</span> EXPORT CSV
-            </button>
-          </div>
-          <span class="wr-post-hint">Submit 11 players to analyze and rank teams. Download auction results.</span>
+        <div class="lot-header">
+          <h3 id="playerName">
+            <i class="fa-solid fa-person-running" style="color:var(--accent);"></i> No player on the lot
+          </h3>
+          <span id="playerBadge" class="player-role-badge"></span>
         </div>
 
-        <!-- ══════ PLAYING XI ══════ -->
-        <section class="wr-card hidden" id="playing11Card">
-          <div class="wr-card-header">
-            <h2 class="wr-card-title"><span class="material-symbols-outlined">groups</span> Submit Playing XI</h2>
-            <div class="xi-counters">
-              <span id="xiCountChip" class="counter-chip">0 / 11 selected</span>
-              <span id="xiOverseasChip" class="counter-chip overseas">✈️ 0 / 4 overseas</span>
-              <span id="impactPlayerChip" class="counter-chip">Impact: Not selected</span>
-            </div>
-          </div>
-          <p class="wr-hint-text">Select exactly 11 players, then choose 1 optional Impact Player from the bench. Max 4 overseas across XI + Impact.</p>
-          <div class="role-legend">
-            <span class="role-dot bat">BAT</span>
-            <span class="role-dot bowl">BOWL</span>
-            <span class="role-dot ar">AR</span>
-            <span class="role-dot wk">WK</span>
-            <span class="role-dot os">✈️ OS</span>
-          </div>
-          <div id="playing11List" class="player-pills"></div>
-          <div class="impact-picker">
-            <label for="impactPlayerSelect" class="wr-label-text impact-label">Impact Player (optional)</label>
-            <div class="row impact-row" style="margin-top:6px;">
-              <select id="impactPlayerSelect" class="wr-input impact-select">
-                <option value="">Select Impact Player</option>
-              </select>
-              <button id="clearImpactBtn" type="button" class="wr-btn-ghost">Clear</button>
-            </div>
-          </div>
-          <div style="margin-top:16px;">
-            <button id="submitXIBtn" class="wr-btn-primary">
-              <span class="material-symbols-outlined">send</span> Submit Playing XI
-            </button>
-          </div>
-          <p id="playing11Message" class="wr-msg" style="margin-top:8px;"></p>
-        </section>
+        <p id="playerMeta" style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;"></p>
 
-        <!-- ══════ AI ANALYSIS ══════ -->
-        <section class="wr-card hidden" id="aiCard">
-          <div class="wr-card-header">
-            <h2 class="wr-card-title"><span class="material-symbols-outlined">smart_toy</span> AI Squad Analysis</h2>
+        <div class="lot-stats">
+          <div class="stat-box accent-stat">
+            <div class="stat-label">Base Price</div>
+            <div class="stat-value" id="basePriceText">—</div>
           </div>
-          <div id="aiSquadPreview" style="margin-bottom:14px;"></div>
-          <button id="analyzeBtn" class="wr-btn-primary">
-            <span class="material-symbols-outlined">auto_fix_high</span> Analyse My XI
+          <div class="stat-box">
+            <div class="stat-label">Rating</div>
+            <div class="stat-value" id="playerRatingText">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Type</div>
+            <div class="stat-value" id="playerTypeText" style="font-size:0.95rem;">—</div>
+          </div>
+          <div class="stat-box" style="grid-column: span 1;">
+            <div class="stat-label">Highest Bid</div>
+            <div id="highestBidText">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bid Controls (shown for team owners when live) -->
+      <div class="card bid-panel hidden" id="bidCard" style="margin-top:16px;">
+        <div class="row between" style="margin-bottom:12px;">
+          <h3 class="bid-title"><i class="fa-solid fa-hand-holding-dollar"></i> Place Your Bid</h3>
+          <button id="skipPlayerBtn" class="btn-eval" style="font-size:0.8rem;padding:6px 14px;" title="Vote to skip this player">
+            <i class="fa-solid fa-forward-step"></i> Skip
           </button>
-          <div id="aiResult" class="hidden" style="margin-top:16px;">
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;" id="aiScoreBar"></div>
-            <div id="aiCommentary" class="wr-ai-commentary"></div>
-          </div>
-          <p id="aiMessage" class="wr-msg" style="margin-top:8px;"></p>
-        </section>
+        </div>
+        <div class="row bid-bar" style="gap:12px;flex-wrap:wrap;">
+          <button id="quickBidBtn" class="accent giant-bid-btn">
+            <span><i class="fa-solid fa-bolt"></i> Quick Bid</span>
+            <span id="quickBidAmount">₹—</span>
+          </button>
+        </div>
+        <p id="bidMessage" class="message"></p>
+      </div>
+    </section>
 
-        <!-- ══════ RANKINGS ══════ -->
-        <section class="wr-card hidden" id="rankingsCard">
-          <div class="wr-card-header">
-            <h2 class="wr-card-title"><span class="material-symbols-outlined">emoji_events</span> Team Rankings</h2>
-          </div>
-          <div id="rankingsTable"></div>
-          <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
-            <button id="bestTeamAiBtn" class="wr-btn-primary">
-              <span class="material-symbols-outlined">psychology</span> AI Evaluate Best Team
-            </button>
-            <p id="bestTeamAiMsg" class="wr-msg" style="margin-top:8px;"></p>
-          </div>
-        </section>
+    <!-- ══════ TEAMS & SQUADS ══════ -->
+    <section class="card hidden" id="teamsCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-shield-halved"></i> Teams &amp; Squads</h2>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="badge-pill" id="teamsLiveChip"></span>
+          <button id="toggleTeamsBtn" style="padding:6px 14px;font-size:0.8rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
+            <i class="fa-solid fa-chevron-up" id="toggleTeamsIcon"></i> Hide
+          </button>
+        </div>
+      </div>
+      <div id="teamsGrid" class="team-squads-grid"></div>
+    </section>
 
-        <!-- Logs card (hidden — logs shown inline in bid panel) -->
-        <section class="hidden" id="logsCard">
-          <div id="logsBoxHidden"></div>
-        </section>
+    <section class="card hidden" id="marketWatchCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-list-check"></i> Auction Tracker</h2>
+      </div>
+      <div class="market-watch-grid">
+        <div class="market-watch-col">
+          <h3>Upcoming Players</h3>
+          <div id="upcomingList" class="market-list"></div>
+        </div>
+        <div class="market-watch-col">
+          <h3>Sold Players</h3>
+          <div id="soldList" class="market-list"></div>
+        </div>
+        <div class="market-watch-col">
+          <h3>Unsold Players</h3>
+          <div id="unsoldList" class="market-list"></div>
+        </div>
+      </div>
+    </section>
 
-        <!-- Room card (hidden — info shown in topnav) -->
-        <section class="hidden" id="roomCard">
-          <div id="roomCardInner"></div>
-        </section>
+    <!-- ══════ PLAYING XI ══════ -->
+    <section class="card hidden" id="playing11Card">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-people-group"></i> Submit Playing XI</h2>
+        <div class="xi-counters">
+          <span id="xiCountChip" class="counter-chip">0 / 11 selected</span>
+          <span id="xiOverseasChip" class="counter-chip overseas">✈️ 0 / 4 overseas</span>
+          <span id="impactPlayerChip" class="counter-chip">Impact: Not selected</span>
+        </div>
+      </div>
+      <p class="muted-text">
+        <i class="fa-solid fa-circle-exclamation" style="color:var(--accent);"></i>
+        Select exactly 11 players from your squad, then choose 1 optional Impact Player from the remaining bench. Max 4 overseas across XI + Impact.
+      </p>
+      <div class="role-legend">
+        <span class="role-dot bat">BAT</span>
+        <span class="role-dot bowl">BOWL</span>
+        <span class="role-dot ar">AR</span>
+        <span class="role-dot wk">WK</span>
+        <span class="role-dot os">✈️ OS</span>
+      </div>
+      <div id="playing11List" class="player-pills"></div>
+      <div class="impact-picker">
+        <label for="impactPlayerSelect" class="join-label impact-label">Impact Player (optional)</label>
+        <div class="row impact-row">
+          <select id="impactPlayerSelect" class="impact-select">
+            <option value="">Select Impact Player</option>
+          </select>
+          <button id="clearImpactBtn" type="button" class="btn-unsold">Clear</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:16px;gap:10px;">
+        <button id="submitXIBtn" class="accent">
+          <i class="fa-solid fa-paper-plane"></i> Submit Playing XI
+        </button>
+      </div>
+      <p id="playing11Message" class="message"></p>
+    </section>
 
-      </main>
-    </div>
-  </div>
+    <!-- ══════ AI ANALYSIS ══════ -->
+    <section class="card hidden" id="aiCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-robot"></i> AI Squad Analysis</h2>
+      </div>
+      <div id="aiSquadPreview" style="margin-bottom:14px;"></div>
+      <button id="analyzeBtn" class="accent">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI
+      </button>
+      <div id="aiResult" class="hidden" style="margin-top:16px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;" id="aiScoreBar"></div>
+        <div id="aiCommentary" style="font-size:0.9rem;color:var(--ink-dim);line-height:1.7;white-space:pre-wrap;background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);"></div>
+      </div>
+      <p id="aiMessage" class="message"></p>
+    </section>
+
+    <!-- ══════ RANKINGS ══════ -->
+    <section class="card hidden" id="rankingsCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-trophy"></i> Team Rankings</h2>
+      </div>
+      <div id="rankingsTable"></div>
+      <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
+        <button id="bestTeamAiBtn" class="accent">
+          <i class="fa-solid fa-brain"></i> AI Evaluate Best Team
+        </button>
+        <p id="bestTeamAiMsg" class="message" style="margin-top:8px;"></p>
+      </div>
+    </section>
+
+    <!-- ══════ LIVE FEED ══════ -->
+    <section class="card hidden" id="logsCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-bolt"></i> Live Auction Feed</h2>
+        <span class="live-dot badge-pill">🔴 Live</span>
+      </div>
+      <div id="logsBox" class="logs"></div>
+    </section>
+
+  </main>
 
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
   <script src="teams.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
