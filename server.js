@@ -11,6 +11,7 @@ const express = require("express");
 const { Server } = require("socket.io");
 
 const PORT = process.env.PORT || 3000;
+const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const PURSE_PER_TEAM = 120;   // crores
 
@@ -979,7 +980,7 @@ io.on("connection", socket => {
     const teamMsg = hostTeamId ? ` (also owning team ${room.teams.find(t=>t.id===hostTeamId)?.name})` : " as Host only";
     pushLog(room, `${room.hostName} created the room${teamMsg}. Waiting for other teams…`);
 
-    const shareLink = `http://localhost:${PORT}?room=${roomId}`;
+    const shareLink = `${APP_URL}?room=${roomId}`;
     socket.emit("room_joined", { roomId, role: "host", teamId: hostTeamId, shareLink });
     broadcastState(room);
   });
@@ -1030,7 +1031,7 @@ io.on("connection", socket => {
         : `${cleanedName} joined as spectator (all 10 teams are filled).`
     );
 
-    const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+    const shareLink = `${APP_URL}?room=${room.roomId}`;
     socket.emit("room_joined", { roomId: room.roomId, role, teamId, shareLink });
     broadcastState(room);
   });
@@ -1309,7 +1310,7 @@ io.on("connection", socket => {
       }
 
       pushLog(room, `${cleanedName} (host) reconnected.`);
-      const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+      const shareLink = `${APP_URL}?room=${room.roomId}`;
       socket.emit("room_joined", { roomId: room.roomId, role: "host", teamId: teamId || null, shareLink });
       broadcastState(room);
       return;
@@ -1338,7 +1339,7 @@ io.on("connection", socket => {
       socket.data.roomId = room.roomId;
 
       pushLog(room, `${cleanedName} reconnected to ${team.name}.`);
-      const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+      const shareLink = `${APP_URL}?room=${room.roomId}`;
       socket.emit("room_joined", { roomId: room.roomId, role: "team-owner", teamId, shareLink });
       broadcastState(room);
       return;
@@ -1348,7 +1349,7 @@ io.on("connection", socket => {
     room.participants[socket.id] = { name: cleanedName, role: "spectator", teamId: null };
     socket.join(room.roomId);
     socket.data.roomId = room.roomId;
-    const shareLink = `http://localhost:${PORT}?room=${room.roomId}`;
+    const shareLink = `${APP_URL}?room=${room.roomId}`;
     socket.emit("room_joined", { roomId: room.roomId, role: "spectator", teamId: null, shareLink });
     broadcastState(room);
   });
