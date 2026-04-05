@@ -465,11 +465,15 @@ function getPublicState(room) {
     .map((p) => ({ id: p.id, name: p.name, role: p.role, basePrice: p.basePrice }));
 
   const upcomingPlayers = [];
-  for (let i = room.lotIndex; i < room.players.length && upcomingPlayers.length < 20; i += 1) {
-    const p = room.players[i];
-    if (!p.sold && !p.unsold) {
-      upcomingPlayers.push({ id: p.id, name: p.name, role: p.role, basePrice: p.basePrice, overseas: p.overseas });
-    }
+  const remainingPlayers = room.players.slice(room.lotIndex).filter(p => !p.sold && !p.unsold);
+  // Shuffle the remaining players
+  for (let i = remainingPlayers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [remainingPlayers[i], remainingPlayers[j]] = [remainingPlayers[j], remainingPlayers[i]];
+  }
+  for (let i = 0; i < remainingPlayers.length && upcomingPlayers.length < 20; i++) {
+    const p = remainingPlayers[i];
+    upcomingPlayers.push({ id: p.id, name: p.name, role: p.role, basePrice: p.basePrice, overseas: p.overseas });
   }
 
   return {

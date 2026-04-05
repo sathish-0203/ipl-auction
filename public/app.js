@@ -856,11 +856,25 @@ function renderPlaying11Selection() {
     state.selectedImpact = null;
   }
 
-  const overseasSelected = [...state.selectedXI].filter(id => squad.find(pl => pl.id === id)?.overseas).length;
+  const overseasSelected = [...state.selectedXI].filter(id => sortedSquad.find(pl => pl.id === id)?.overseas).length;
   const impactPlayer = state.selectedImpact ? squad.find(p => p.id === state.selectedImpact) : null;
   const totalOverseasWithImpact = overseasSelected + (impactPlayer?.overseas ? 1 : 0);
 
-  squad.forEach(player => {
+  // Sort squad: selected players first, in selection order, then unselected
+  const sortedSquad = [...squad].sort((a, b) => {
+    const aSelected = state.selectedXI.has(a.id);
+    const bSelected = state.selectedXI.has(b.id);
+    if (aSelected && bSelected) {
+      const aIndex = Array.from(state.selectedXI).indexOf(a.id);
+      const bIndex = Array.from(state.selectedXI).indexOf(b.id);
+      return aIndex - bIndex;
+    }
+    if (aSelected) return -1;
+    if (bSelected) return 1;
+    return 0;
+  });
+
+  sortedSquad.forEach((player, index) => {
     const isSelected  = state.selectedXI.has(player.id);
     const isOverseas  = !!player.overseas;
     const overseasFull = !isSelected && isOverseas && overseasSelected >= 4;
@@ -869,9 +883,17 @@ function renderPlaying11Selection() {
     const pill = document.createElement("div");
     pill.className = `player-pill ${isSelected ? "selected" : ""} ${isOverseas ? "overseas-pill" : ""} ${(overseasFull || xiFull) ? "disabled" : ""}`;
 
+    // Determine position for selected players
+    let positionLabel = "";
+    if (isSelected) {
+      const selectedArray = Array.from(state.selectedXI);
+      const position = selectedArray.indexOf(player.id) + 1;
+      positionLabel = position.toString();
+    }
+
     pill.innerHTML = `
       <div>
-        <div class="pill-name">${player.name}</div>
+        <div class="pill-name">${isSelected ? `${positionLabel}: ` : ""}${player.name}</div>
         <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">
           Rating: ${player.rating} · ${cr(player.soldPrice)}
         </div>
@@ -886,7 +908,7 @@ function renderPlaying11Selection() {
       if (state.selectedXI.has(player.id)) state.selectedXI.delete(player.id);
       else {
         if (state.selectedXI.size >= 11) { setXIMessage("You can only select 11 players."); return; }
-        const nowOverseas = [...state.selectedXI].filter(id => squad.find(p => p.id === id)?.overseas).length;
+        const nowOverseas = [...state.selectedXI].filter(id => sortedSquad.find(p => p.id === id)?.overseas).length;
         if (isOverseas && nowOverseas >= 4) { setXIMessage("Max 4 overseas players allowed."); return; }
         state.selectedXI.add(player.id);
       }
@@ -902,7 +924,7 @@ function renderPlaying11Selection() {
   });
 
   if (els.impactPlayerSelect) {
-    const candidates = squad.filter(p => !state.selectedXI.has(p.id));
+    const candidates = sortedSquad.filter(p => !state.selectedXI.has(p.id));
     const options = ["<option value=\"\">Select Impact Player</option>"];
     candidates.forEach((p) => {
       const osTag = p.overseas ? " \u00b7 OS" : "";
