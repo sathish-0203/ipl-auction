@@ -1660,3 +1660,14 @@ if (els.homeBtnHeader) {
 
 // Auto-switch to Join tab
 if (tabJoin) tabJoin.click();
+
+// ── Persistent Session Warning ──
+// Warn users before they accidentally close the tab or navigate away during a live auction
+window.addEventListener("beforeunload", (e) => {
+  // Only warn if the user is currently in a room and hasn't explicitly clicked "Home"
+  if (state.roomId && state.room && state.room.status !== "lobby") {
+    // Note: Modern browsers don't allow custom text, but they require preventDefault + returnValue
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
