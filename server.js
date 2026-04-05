@@ -473,17 +473,11 @@ function getPublicState(room) {
     .filter((p) => p.unsold)
     .map((p) => ({ id: p.id, name: p.name, role: p.role, basePrice: p.basePrice }));
 
-  const upcomingPlayers = [];
-  const remainingPlayers = room.players.slice(room.lotIndex).filter(p => !p.sold && !p.unsold);
-  // Shuffle the remaining players
-  for (let i = remainingPlayers.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [remainingPlayers[i], remainingPlayers[j]] = [remainingPlayers[j], remainingPlayers[i]];
-  }
-  for (let i = 0; i < remainingPlayers.length && upcomingPlayers.length < 20; i++) {
-    const p = remainingPlayers[i];
-    upcomingPlayers.push({ id: p.id, name: p.name, role: p.role, basePrice: p.basePrice, overseas: p.overseas });
-  }
+  const upcomingPlayers = room.players
+    .slice(room.lotIndex)
+    .filter(p => !p.sold && !p.unsold)
+    .slice(0, 20)
+    .map(p => ({ id: p.id, name: p.name, role: p.role, basePrice: p.basePrice, overseas: p.overseas }));
 
   return {
     roomId:           room.roomId,
