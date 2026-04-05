@@ -1234,3 +1234,25 @@ button:disabled { cursor: not-allowed; filter: grayscale(40%); }
     text-transform: uppercase;
     opacity: 0.6;
 }
+.site-footer {
+    margin-top: 40px;
+    padding: 30px 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.footer-content p {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--ink-dim, #a0a0a0);
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.footer-tagline {
+    font-size: 0.75rem !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
