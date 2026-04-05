@@ -1256,3 +1256,9 @@ button:disabled { cursor: not-allowed; filter: grayscale(40%); }
 .share-label-small { font-size: 0.82rem; }
 .share-link-input { flex: 1; min-width: 200px; font-size: 0.82rem; }
 .share-copy-btn { padding: 8px 14px; font-size: 0.82rem; }
+
+/* ── Hero Logo ── */
+.hero-logo-container { margin-bottom: 24px; display: flex; justify-content: center; width: 100%; pointer-events: none; }
+.hero-logo { max-width: 340px; height: auto; filter: drop-shadow(0 0 30px rgba(0, 120, 255, 0.4)); animation: logo-float 4s ease-in-out infinite; }
+@keyframes logo-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@media (max-width: 480px) { .hero-logo { max-width: 260px; } }
