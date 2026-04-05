@@ -136,6 +136,8 @@ const els = {
 
   playerTypeText:   document.getElementById("playerTypeText"),
   highestBidText:   document.getElementById("highestBidText"),
+  arenaHomeBtnContainer: document.getElementById("arenaHomeBtnContainer"),
+  homeBtnArena:      document.getElementById("homeBtnArena"),
 
   // Bid controls
   bidCard:        document.getElementById("bidCard"),
@@ -435,7 +437,14 @@ function renderLot() {
     els.playerRatingText.textContent = "—";
     els.playerTypeText.textContent = "—";
     els.highestBidText.innerHTML = "—";
+    if (els.arenaHomeBtnContainer) {
+      els.arenaHomeBtnContainer.classList.toggle("hidden", status !== "ended");
+    }
     return;
+  }
+
+  if (els.arenaHomeBtnContainer) {
+    els.arenaHomeBtnContainer.classList.add("hidden");
   }
 
   els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${lot.name}`;
@@ -1606,6 +1615,17 @@ if (els.homeBtn) {
 const urlRoom = new URLSearchParams(window.location.search).get("room");
 if (urlRoom) {
   els.roomInput.value = urlRoom;
-  // Auto-switch to Join tab
-  if (tabJoin) tabJoin.click();
 }
+
+if (els.homeBtnArena) {
+  els.homeBtnArena.addEventListener("click", () => {
+    const ok = window.confirm("Return to home? Your current session will be cleared.");
+    if (!ok) return;
+    localStorage.removeItem("auction_session");
+    window.location.search = ""; 
+    window.location.reload();
+  });
+}
+
+// Auto-switch to Join tab
+if (tabJoin) tabJoin.click();
