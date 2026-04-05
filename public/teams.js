@@ -24,7 +24,7 @@ const IPL_TEAMS = [
     short: "RCB",
     primary: "#C8102E",
     secondary: "#1A1A1A",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/Royal_Challengers_Bengaluru_logo.png/200px-Royal_Challengers_Bengaluru_logo.png",
+    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/Royal_Challengers_Bengaluru_logo.png/250px-Royal_Challengers_Bengaluru_logo.png",
     stadium: "M Chinnaswamy Stadium"
   },
   {
@@ -78,7 +78,7 @@ const IPL_TEAMS = [
     short: "LSG",
     primary: "#A0CFEC",
     secondary: "#003F88",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Lucknow_Super_Giants_IPL_Logo.svg/220px-Lucknow_Super_Giants_IPL_Logo.svg.png",
+    logo: "https://i.ibb.co/vzZ4XkP/lsg-new-logo.png", // New 2026 Elephant Logo
     stadium: "BRSABV Ekana Stadium"
   },
   {
