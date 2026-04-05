@@ -231,7 +231,6 @@
           <h3 id="playerName">
             <i class="fa-solid fa-person-running" style="color:var(--accent);"></i> No player on the lot
           </h3>
-          <span id="playerBadge" class="player-role-badge"></span>
         </div>
 
         <p id="playerMeta" style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;"></p>
@@ -243,12 +242,16 @@
           </div>
 
           <div class="stat-box">
-            <div class="stat-label">Type</div>
-            <div class="stat-value" id="playerTypeText" style="font-size:0.95rem;">—</div>
+            <div class="stat-label">Nationality</div>
+            <div id="playerTypeText" class="stat-value" style="font-size:0.95rem;">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Role</div>
+            <div id="playerRoleText" class="stat-value" style="font-size:0.95rem;">—</div>
           </div>
           <div class="stat-box" style="grid-column: span 1;">
             <div class="stat-label">Highest Bid</div>
-            <div id="highestBidText">—</div>
+            <div id="highestBidText" class="stat-value" style="font-size:1.4rem;">—</div>
           </div>
         </div>
       </div>
@@ -360,9 +363,6 @@
     <section class="card hidden" id="rankingsCard">
       <div class="section-header">
         <h2><i class="fa-solid fa-trophy"></i> Final Rankings</h2>
-        <button id="downloadCsvBtn" class="btn btn-outline small hidden">
-          <i class="fa-solid fa-file-csv"></i> Download CSV
-        </button>
       </div>
       <div id="rankingsTable"></div>
       <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
@@ -370,6 +370,15 @@
           <i class="fa-solid fa-brain"></i> AI Evaluate Best Team
         </button>
         <p id="bestTeamAiMsg" class="message" style="margin-top:8px;"></p>
+      </div>
+
+      <div class="row" style="margin-top: 32px; justify-content: center; gap: 16px;">
+        <button id="downloadCsvBtnFinal" class="btn btn-outline hidden">
+          <i class="fa-solid fa-file-csv"></i> Download CSV
+        </button>
+        <button id="homeBtn" class="btn btn-outline">
+          <i class="fa-solid fa-house"></i> Go to Home
+        </button>
       </div>
     </section>
 

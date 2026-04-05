@@ -131,7 +131,7 @@ const els = {
   lotBox:           document.getElementById("lotBox"),
   playerName:       document.getElementById("playerName"),
   playerMeta:       document.getElementById("playerMeta"),
-  playerBadge:      document.getElementById("playerBadge"),
+  playerRoleText:   document.getElementById("playerRoleText"),
   basePriceText:    document.getElementById("basePriceText"),
 
   playerTypeText:   document.getElementById("playerTypeText"),
@@ -176,7 +176,8 @@ const els = {
   // Rankings
   rankingsCard:  document.getElementById("rankingsCard"),
   rankingsTable: document.getElementById("rankingsTable"),
-  downloadCsvBtn: document.getElementById("downloadCsvBtn"),
+  downloadCsvBtn: document.getElementById("downloadCsvBtnFinal"),
+  homeBtn:        document.getElementById("homeBtn"),
   bestTeamAiPanel: document.getElementById("bestTeamAiPanel"),
   bestTeamAiBtn: document.getElementById("bestTeamAiBtn"),
   bestTeamAiMsg: document.getElementById("bestTeamAiMsg"),
@@ -430,7 +431,6 @@ function renderLot() {
   if (!lot) {
     els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${status === "ended" ? "🏆 Auction Complete!" : "⏳ Waiting for next player…"}`;
     els.playerMeta.textContent = "";
-    if (els.playerBadge) els.playerBadge.textContent = "";
     els.basePriceText.textContent = "—";
     els.playerRatingText.textContent = "—";
     els.playerTypeText.textContent = "—";
@@ -441,17 +441,15 @@ function renderLot() {
   els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${lot.name}`;
   els.playerMeta.textContent = lot.team ? `Team: ${lot.team}` : "";
 
-  const rc = roleClass(lot.role);
-  if (els.playerBadge) {
-    els.playerBadge.textContent = roleShort(lot.role);
-    els.playerBadge.className = `player-role-badge role-${rc}`;
-  }
-
   els.basePriceText.textContent = cr(lot.basePrice);
 
   els.playerTypeText.innerHTML = lot.overseas
     ? `<span style="color:#a78bfa">✈️ Overseas</span>`
     : `<span style="color:#86efac">🇮🇳 Indian</span>`;
+
+  if (els.playerRoleText) {
+    els.playerRoleText.textContent = lot.role || "—";
+  }
 
   // Highest bid shown to all
   if (bid) {
@@ -1592,6 +1590,16 @@ function downloadSquadsCSV() {
 
 if (els.downloadCsvBtn) {
   els.downloadCsvBtn.addEventListener("click", downloadSquadsCSV);
+}
+
+if (els.homeBtn) {
+  els.homeBtn.addEventListener("click", () => {
+    const ok = window.confirm("Return to home? Your current session will be cleared.");
+    if (!ok) return;
+    localStorage.removeItem("auction_session");
+    window.location.search = ""; // clear room query
+    window.location.reload();
+  });
 }
 
 // Pre-fill room code ...
