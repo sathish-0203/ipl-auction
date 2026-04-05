@@ -128,142 +128,11 @@ const els = {
   goPlaying11Btn:    document.getElementById("goPlaying11Btn"),
 
   // Lot box
-/* ══════════════════════════════════════════════════
-   IPL AUCTION ARENA — app.js
-   ══════════════════════════════════════════════════ */
-
-// Use same-origin in production, but fall back to localhost:3000 for local preview/file modes.
-const socketServerUrl = (() => {
-  if (window.__SOCKET_URL) return window.__SOCKET_URL;
-
-  const host = window.location.hostname;
-  const port = window.location.port;
-  const isLocalHost = host === "localhost" || host === "127.0.0.1";
-  const isFileProtocol = window.location.protocol === "file:";
-
-  if (isFileProtocol) return "http://localhost:3000";
-  if (isLocalHost && port && port !== "3000") return `${window.location.protocol}//${host}:3000`;
-
-  return undefined;
-})();
-
-const socket = (typeof io === "function")
-  ? io(socketServerUrl, { transports: ["websocket", "polling"] })
-  : {
-      connected: false,
-      emit: () => {},
-      on: () => {}
-    };
-
-const TEAM_DATA = (typeof IPL_TEAMS !== "undefined" && Array.isArray(IPL_TEAMS) && IPL_TEAMS.length)
-  ? IPL_TEAMS
-  : [
-      { id: "team-1", name: "Chennai Super Kings", short: "CSK", primary: "#F5A623", secondary: "#002E5D", logo: "" },
-      { id: "team-2", name: "Mumbai Indians", short: "MI", primary: "#004BA0", secondary: "#D1AB3E", logo: "" },
-      { id: "team-3", name: "Royal Challengers Bengaluru", short: "RCB", primary: "#C8102E", secondary: "#1A1A1A", logo: "" },
-      { id: "team-4", name: "Kolkata Knight Riders", short: "KKR", primary: "#3A225D", secondary: "#F0C416", logo: "" },
-      { id: "team-5", name: "Rajasthan Royals", short: "RR", primary: "#E91E8C", secondary: "#254AA5", logo: "" },
-      { id: "team-6", name: "Delhi Capitals", short: "DC", primary: "#0078BC", secondary: "#EF1C25", logo: "" },
-      { id: "team-7", name: "Sunrisers Hyderabad", short: "SRH", primary: "#F7A721", secondary: "#E7511B", logo: "" },
-      { id: "team-8", name: "Punjab Kings", short: "PBKS", primary: "#ED1B24", secondary: "#A7A9AC", logo: "" },
-      { id: "team-9", name: "Lucknow Super Giants", short: "LSG", primary: "#A0CFEC", secondary: "#003F88", logo: "" },
-      { id: "team-10", name: "Gujarat Titans", short: "GT", primary: "#1B3A6B", secondary: "#ADB5BD", logo: "" },
-    ];
-
-function on(el, eventName, handler) {
-  if (el) el.addEventListener(eventName, handler);
-}
-
-function buildTeamFallbackDataUri(team, size = 88) {
-  const short = ((team?.short || "TM").toUpperCase()).slice(0, 3);
-  const primary = team?.primary || "#1f2937";
-  const secondary = team?.secondary || "#0f172a";
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${primary}"/>
-          <stop offset="100%" stop-color="${secondary}"/>
-        </linearGradient>
-      </defs>
-      <circle cx="${size / 2}" cy="${size / 2}" r="${size / 2 - 2}" fill="url(#g)" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
-      <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" font-size="${Math.floor(size * 0.28)}" font-weight="800" font-family="Arial, sans-serif" fill="#ffffff">${short}</text>
-    </svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg.replace(/\n\s*/g, ""))}`;
-}
-
-function getSafeTeamLogo(team, size = 88) {
-  if (team?.logo) return team.logo;
-  return buildTeamFallbackDataUri(team, size);
-}
-
-function buildTeamLogoImg(team, className, size = 36, extraAttr = "") {
-  const safe = getSafeTeamLogo(team, Math.max(size * 2, 80));
-  const fallback = buildTeamFallbackDataUri(team, Math.max(size * 2, 80));
-  const cls = className ? ` class="${className}"` : "";
-  const alt = (team?.short || team?.name || "Team").replace(/"/g, "&quot;");
-  return `<img src="${safe}" alt="${alt}" width="${size}" height="${size}"${cls} ${extraAttr} onerror="this.onerror=null;this.src='${fallback}'" />`;
-}
-
-/* ── DOM refs ── */
-const els = {
-  // Team selector
-  teamSelectCard:    document.getElementById("teamSelectCard"),
-  teamSelectGrid:    document.getElementById("teamSelectGrid"),
-  teamSelectMsg:     document.getElementById("teamSelectMsg"),
-  selectedTeamBadge: document.getElementById("selectedTeamBadge"),
-
-  // Join
-  joinCard:    document.getElementById("joinCard"),
-  nameInput:   document.getElementById("nameInput"),
-  roomInput:   document.getElementById("roomInput"),
-  createBtn:   document.getElementById("createBtn"),
-  joinBtn:     document.getElementById("joinBtn"),
-  joinMessage: document.getElementById("joinMessage"),
-
-  // Room
-  roomCard:       document.getElementById("roomCard"),
-  roomCodeText:   document.getElementById("roomCodeText"),
-  identityText:   document.getElementById("identityText"),
-  shareCard:      document.getElementById("shareCard"),
-  shareLinkInput: document.getElementById("shareLinkInput"),
-  copyLinkBtn:    document.getElementById("copyLinkBtn"),
-  shareApps:      document.getElementById("shareApps"),
-  shareWhatsapp:  document.getElementById("shareWhatsapp"),
-  shareTelegram:  document.getElementById("shareTelegram"),
-  shareTwitter:   document.getElementById("shareTwitter"),
-  shareEmail:     document.getElementById("shareEmail"),
-
-  // Timer
-  timerContainer: document.getElementById("timerContainer"),
-  timerRingFill:  document.getElementById("timerRingFill"),
-  timerText:      document.getElementById("timerText"),
-
-  // Auction & Host Controls
-  auctionCard:       document.getElementById("auctionCard"),
-  statusText:        document.getElementById("statusText"),
-  livePulse:         document.getElementById("livePulse"),
-  statusIcon:        document.getElementById("statusIcon"),
-  statusChip:        document.getElementById("statusChip"),
-  myPurseText:       document.getElementById("myPurseText"),
-  myPurseChip:       document.getElementById("myPurseChip"),
-  hostControls:      document.getElementById("hostControls"),
-  startAuctionBtn:   document.getElementById("startAuctionBtn"),
-  pauseAuctionBtn:   document.getElementById("pauseAuctionBtn"),
-  skipPlayerBtn:     document.getElementById("skipPlayerBtn"),
-  endAuctionBtn:     document.getElementById("endAuctionBtn"),
-  evaluateBtn:       document.getElementById("evaluateBtn"),
-  timerSelect:       document.getElementById("timerSelect"),
-  postAuctionActions: document.getElementById("postAuctionActions"),
-  goPlaying11Btn:    document.getElementById("goPlaying11Btn"),
-
-  // Lot box
   lotBox:           document.getElementById("lotBox"),
   playerName:       document.getElementById("playerName"),
   playerMeta:       document.getElementById("playerMeta"),
   playerRoleText:   document.getElementById("playerRoleText"),
   basePriceText:    document.getElementById("basePriceText"),
-
   playerTypeText:   document.getElementById("playerTypeText"),
   highestBidText:   document.getElementById("highestBidText"),
   arenaHomeBtnContainer: document.getElementById("arenaHomeBtnContainer"),
@@ -321,6 +190,10 @@ const els = {
   toggleLogsBtn: document.getElementById("toggleLogsBtn"),
   toggleLogsIcon: document.getElementById("toggleLogsIcon")
 };
+
+// Set current year in footer
+const yearEl = document.getElementById("currentYear");
+if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 /* ── Client State ── */
 const state = {
