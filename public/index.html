@@ -41,7 +41,7 @@
         <h1 class="hero-title">
           <i class="fa-solid fa-cricket-bat-ball hero-icon"></i> IPL Auction Arena
         </h1>
-        <p class="muted-text" style="margin-top:10px; font-size:1rem;">
+        <p class="muted-text hero-subtitle-dim">
           10 teams · 254 players · Real-time bidding · Playing XI intelligence
         </p>
       </div>
@@ -139,7 +139,7 @@
     <div id="joinCard" class="hidden"></div>
 
     <!-- ══════ ROOM INFO ══════ -->
-    <section class="card hidden" id="roomCard" style="border-bottom: 2px solid var(--accent);">
+    <section class="card hidden room-card-highlight" id="roomCard">
       <div class="row between" style="flex-wrap:wrap; gap:16px;">
         <div>
           <div class="dashboard-title">
@@ -147,11 +147,11 @@
             Auction Arena
             <span id="roomCodeText" class="room-id-badge"></span>
           </div>
-          <div class="row" style="gap:8px;">
-            <button id="homeBtnHeader" class="btn btn-outline" style="padding:6px 12px; font-size:0.85rem;" title="Return to Main Page">
+          <div class="arena-header-row">
+            <button id="homeBtnHeader" class="btn btn-outline home-btn-header" title="Return to Main Page">
               <i class="fa-solid fa-house"></i>
             </button>
-            <span id="identityText" class="badge-pill" style="opacity:0.8;"></span>
+            <span id="identityText" class="badge-pill badge-pill-dim"></span>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -166,7 +166,7 @@
           </span>
         </div>
       </div>
-      <div id="postAuctionActions" class="row hidden" style="margin-top:14px;gap:10px;flex-wrap:wrap;">
+      <div id="postAuctionActions" class="row hidden post-auction-row">
         <button id="goPlaying11Btn" class="accent">
           <i class="fa-solid fa-clipboard-list"></i> Make Playing XI
         </button>
@@ -233,11 +233,11 @@
 
         <div class="lot-header">
           <h3 id="playerName">
-            <i class="fa-solid fa-person-running" style="color:var(--accent);"></i> No player on the lot
+            <i class="fa-solid fa-person-running player-name-icon"></i> No player on the lot
           </h3>
         </div>
 
-        <p id="playerMeta" style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;"></p>
+        <p id="playerMeta" class="player-meta-small"></p>
 
         <div class="lot-stats">
           <div class="stat-box accent-stat">
@@ -247,19 +247,19 @@
 
           <div class="stat-box">
             <div class="stat-label">Nationality</div>
-            <div id="playerTypeText" class="stat-value" style="font-size:0.95rem;">—</div>
+            <div id="playerTypeText" class="stat-value stat-value-role">—</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Role</div>
-            <div id="playerRoleText" class="stat-value" style="font-size:0.95rem;">—</div>
+            <div id="playerRoleText" class="stat-value stat-value-role">—</div>
           </div>
           <div class="stat-box" style="grid-column: span 1;">
             <div class="stat-label">Highest Bid</div>
-            <div id="highestBidText" class="stat-value" style="font-size:1.4rem;">—</div>
+            <div id="highestBidText" class="stat-value stat-value-large">—</div>
           </div>
         </div>
-        <div id="arenaHomeBtnContainer" class="hidden" style="margin-top:24px; text-align:center;">
-          <button id="homeBtnArena" class="btn btn-outline" style="width:100%; justify-content:center;">
+        <div id="arenaHomeBtnContainer" class="hidden arena-home-container">
+          <button id="homeBtnArena" class="btn btn-outline home-btn-arena">
             <i class="fa-solid fa-house"></i> Go to Home
           </button>
         </div>
@@ -267,9 +267,9 @@
 
       <!-- Bid Controls (shown for team owners when live) -->
       <div class="card bid-panel hidden" id="bidCard" style="margin-top:16px;">
-        <div class="row between" style="margin-bottom:12px;">
+        <div class="row between bid-title-row">
           <h3 class="bid-title"><i class="fa-solid fa-hand-holding-dollar"></i> Place Your Bid</h3>
-          <button id="skipPlayerBtn" class="btn-eval" style="font-size:0.8rem;padding:6px 14px;" title="Vote to skip this player">
+          <button id="skipPlayerBtn" class="btn-eval skip-btn-small" title="Vote to skip this player">
             <i class="fa-solid fa-forward-step"></i> Skip
           </button>
         </div>
@@ -381,7 +381,7 @@
         <p id="bestTeamAiMsg" class="message" style="margin-top:8px;"></p>
       </div>
 
-      <div class="row" style="margin-top: 32px; justify-content: center; gap: 16px;">
+      <div class="row final-home-row">
         <button id="downloadCsvBtnFinal" class="btn btn-outline hidden">
           <i class="fa-solid fa-file-csv"></i> Download CSV
         </button>
@@ -406,14 +406,14 @@
     </section>
 
     <!-- ══════ SHARE SECTION (BOTTOM) ══════ -->
-    <section class="card hidden" id="shareCard" style="margin-top: 40px; border-top: 1px solid var(--accent);">
+    <section class="card hidden share-section-bot" id="shareCard">
       <div class="section-header">
-        <h3><i class="fa-solid fa-share-nodes" style="color:var(--accent);"></i> Invite Friends to Join</h3>
+        <h3><i class="fa-solid fa-share-nodes arena-title-icon"></i> Invite Friends to Join</h3>
       </div>
-      <div class="row" style="gap:10px; flex-wrap:wrap;">
-        <p class="small">Share Link:</p>
-        <input id="shareLinkInput" readonly title="Share room link" style="flex:1;min-width:200px;font-size:0.82rem;" />
-        <button id="copyLinkBtn" style="padding:8px 14px;font-size:0.82rem;">
+      <div class="row">
+        <p class="share-label-small">Share Link:</p>
+        <input id="shareLinkInput" readonly title="Share room link" class="share-link-input" />
+        <button id="copyLinkBtn" class="share-copy-btn">
           <i class="fa-solid fa-copy"></i> Copy
         </button>
       </div>

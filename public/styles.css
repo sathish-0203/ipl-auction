@@ -1256,3 +1256,25 @@ button:disabled { cursor: not-allowed; filter: grayscale(40%); }
     text-transform: uppercase;
     opacity: 0.6;
 }
+
+/* ── Navigation & Arena Polish ── */
+.hero-subtitle-dim { margin-top: 10px; font-size: 1rem; }
+.room-card-highlight { border-bottom: 2px solid var(--accent); }
+.arena-header-row { display: flex; align-items: center; gap: 8px; }
+.badge-pill-dim { opacity: 0.8; }
+.home-btn-header { padding: 6px 12px; font-size: 0.85rem; }
+.post-auction-row { margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+.arena-title-icon { color: var(--accent); margin-right: 8px; }
+.player-name-icon { color: var(--accent); }
+.player-meta-small { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+.stat-value-role { font-size: 0.95rem; }
+.stat-value-large { font-size: 1.4rem; }
+.arena-home-container { margin-top: 24px; text-align: center; }
+.home-btn-arena { width: 100%; justify-content: center; }
+.bid-title-row { margin-bottom: 12px; }
+.skip-btn-small { font-size: 0.8rem; padding: 6px 14px; }
+.final-home-row { margin-top: 32px; justify-content: center; gap: 16px; }
+.share-section-bot { margin-top: 40px; border-top: 1px solid var(--accent); }
+.share-label-small { font-size: 0.82rem; }
+.share-link-input { flex: 1; min-width: 200px; font-size: 0.82rem; }
+.share-copy-btn { padding: 8px 14px; font-size: 0.82rem; }
