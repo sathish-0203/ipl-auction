@@ -95,6 +95,7 @@ const els = {
   roomCard:       document.getElementById("roomCard"),
   roomCodeText:   document.getElementById("roomCodeText"),
   identityText:   document.getElementById("identityText"),
+  shareCard:      document.getElementById("shareCard"),
   shareLinkInput: document.getElementById("shareLinkInput"),
   copyLinkBtn:    document.getElementById("copyLinkBtn"),
   shareApps:      document.getElementById("shareApps"),
@@ -111,6 +112,8 @@ const els = {
   // Auction & Host Controls
   auctionCard:       document.getElementById("auctionCard"),
   statusText:        document.getElementById("statusText"),
+  livePulse:         document.getElementById("livePulse"),
+  statusIcon:        document.getElementById("statusIcon"),
   statusChip:        document.getElementById("statusChip"),
   myPurseText:       document.getElementById("myPurseText"),
   myPurseChip:       document.getElementById("myPurseChip"),
@@ -122,16 +125,19 @@ const els = {
   evaluateBtn:       document.getElementById("evaluateBtn"),
   timerSelect:       document.getElementById("timerSelect"),
   postAuctionActions: document.getElementById("postAuctionActions"),
+  goPlaying11Btn:    document.getElementById("goPlaying11Btn"),
 
   // Lot box
   lotBox:           document.getElementById("lotBox"),
   playerName:       document.getElementById("playerName"),
   playerMeta:       document.getElementById("playerMeta"),
-  playerBadge:      document.getElementById("playerBadge"),
+  playerRoleText:   document.getElementById("playerRoleText"),
   basePriceText:    document.getElementById("basePriceText"),
-  playerRatingText: document.getElementById("playerRatingText"),
   playerTypeText:   document.getElementById("playerTypeText"),
   highestBidText:   document.getElementById("highestBidText"),
+  arenaHomeBtnContainer: document.getElementById("arenaHomeBtnContainer"),
+  homeBtnArena:      document.getElementById("homeBtnArena"),
+  homeBtnHeader:     document.getElementById("homeBtnHeader"),
 
   // Bid controls
   bidCard:        document.getElementById("bidCard"),
@@ -144,7 +150,8 @@ const els = {
   teamsGrid:           document.getElementById("teamsGrid"),
   auctionProgressText: document.getElementById("auctionProgressText"),
   marketWatchCard:     document.getElementById("marketWatchCard"),
-  upcomingList:        document.getElementById("upcomingList"),
+  upcomingCard:        document.getElementById("upcomingCard"),
+  upcomingList:        document.getElementById("upcomingListTop"),
   soldList:            document.getElementById("soldList"),
   unsoldList:          document.getElementById("unsoldList"),
 
@@ -171,14 +178,22 @@ const els = {
   // Rankings
   rankingsCard:  document.getElementById("rankingsCard"),
   rankingsTable: document.getElementById("rankingsTable"),
+  downloadCsvBtn: document.getElementById("downloadCsvBtnFinal"),
+  homeBtn:        document.getElementById("homeBtn"),
   bestTeamAiPanel: document.getElementById("bestTeamAiPanel"),
   bestTeamAiBtn: document.getElementById("bestTeamAiBtn"),
   bestTeamAiMsg: document.getElementById("bestTeamAiMsg"),
 
   // Feed
-  logsCard: document.getElementById("logsCard"),
-  logsBox:  document.getElementById("logsBox"),
+  logsCard:   document.getElementById("logsCard"),
+  logsBox:    document.getElementById("logsBox"),
+  toggleLogsBtn: document.getElementById("toggleLogsBtn"),
+  toggleLogsIcon: document.getElementById("toggleLogsIcon")
 };
+
+// Set current year in footer
+const yearEl = document.getElementById("currentYear");
+if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 /* ── Client State ── */
 const state = {
@@ -192,10 +207,7 @@ const state = {
   chosenTeamId: null,   // team picked in selector before joining
   shareLink:   "",
   timerMax:    10,
-  isOptimisticLoading: false,
-  hasAutoScrolledToPlaying11: false,
-  hasAutoScrolledToRankings: false,
-  prevRoomStatus: null,
+  isOptimisticLoading: false
 };
 
 /* ══════════════════════════════════════════════════
@@ -425,28 +437,31 @@ function renderLot() {
   if (!lot) {
     els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${status === "ended" ? "🏆 Auction Complete!" : "⏳ Waiting for next player…"}`;
     els.playerMeta.textContent = "";
-    if (els.playerBadge) els.playerBadge.textContent = "";
     els.basePriceText.textContent = "—";
-    els.playerRatingText.textContent = "—";
     els.playerTypeText.textContent = "—";
     els.highestBidText.innerHTML = "—";
+    if (els.arenaHomeBtnContainer) {
+      els.arenaHomeBtnContainer.classList.toggle("hidden", status !== "ended");
+    }
     return;
+  }
+
+  if (els.arenaHomeBtnContainer) {
+    els.arenaHomeBtnContainer.classList.add("hidden");
   }
 
   els.playerName.innerHTML = `<i class="fa-solid fa-person-running" style="color:var(--accent);"></i> ${lot.name}`;
   els.playerMeta.textContent = lot.team ? `Team: ${lot.team}` : "";
 
-  const rc = roleClass(lot.role);
-  if (els.playerBadge) {
-    els.playerBadge.textContent = roleShort(lot.role);
-    els.playerBadge.className = `player-role-badge role-${rc}`;
-  }
-
   els.basePriceText.textContent = cr(lot.basePrice);
-  els.playerRatingText.textContent = lot.rating ? `${lot.rating} / 100` : "—";
+
   els.playerTypeText.innerHTML = lot.overseas
     ? `<span style="color:#a78bfa">✈️ Overseas</span>`
     : `<span style="color:#86efac">🇮🇳 Indian</span>`;
+
+  if (els.playerRoleText) {
+    els.playerRoleText.textContent = lot.role || "—";
+  }
 
   // Highest bid shown to all
   if (bid) {
@@ -815,9 +830,16 @@ function renderMarketWatch() {
     targetEl.innerHTML = entries.map(formatter).join("");
   };
 
-  renderEntries(els.upcomingList, upcoming, (p) =>
-    `<div class="market-item"><span>${p.name}</span><span>${p.role} · ${cr(p.basePrice)}</span></div>`
-  );
+  renderEntries(els.upcomingList, upcoming, (p) => {
+    const roleTag = p.overseas ? `${p.role} ✈️` : p.role;
+    return `<div class="market-item">
+      <span class="player-name">${p.name}</span>
+      <div class="player-meta">
+        <span>${roleTag}</span>
+        <span class="price-label">${cr(p.basePrice)}</span>
+      </div>
+    </div>`;
+  });
 
   renderEntries(els.soldList, sold, (p) => {
     const team = state.room.teams.find((t) => t.id === p.soldTo);
@@ -834,6 +856,7 @@ function renderPlaying11Selection() {
   const ended   = state.room?.status === "ended";
 
   els.playing11Card.classList.toggle("hidden", !(isOwner && ended));
+  els.aiCard.classList.toggle("hidden", !(isOwner && ended));
   if (els.postAuctionActions) {
     els.postAuctionActions.classList.toggle("hidden", !(isOwner && ended));
   }
@@ -841,12 +864,6 @@ function renderPlaying11Selection() {
   if (!(isOwner && ended)) return;
   const team  = myTeam();
   const squad = team ? team.squad : [];
-
-  if (team && !state.hasAutoScrolledToPlaying11 && !state.room?.playing11Submissions?.[team.id]) {
-    els.playing11Card.scrollIntoView({ behavior: "smooth", block: "start" });
-    state.hasAutoScrolledToPlaying11 = true;
-  }
-
   els.playing11List.innerHTML = "";
 
   if (state.selectedImpact && !squad.some(p => p.id === state.selectedImpact)) {
@@ -895,7 +912,7 @@ function renderPlaying11Selection() {
       <div>
         <div class="pill-name">${isSelected ? `${positionLabel}: ` : ""}${player.name}</div>
         <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">
-          Rating: ${player.rating} · ${cr(player.soldPrice)}
+          ${cr(player.soldPrice)}
         </div>
       </div>
       <div class="pill-meta">
@@ -955,12 +972,11 @@ function renderRankings() {
   const rankings = state.room?.rankings;
   const visible  = Array.isArray(rankings) && rankings.length > 0;
   els.rankingsCard.classList.toggle("hidden", !visible);
-  if (!visible) return;
-
-  if (!state.hasAutoScrolledToRankings) {
-    els.rankingsCard.scrollIntoView({ behavior: "smooth", block: "start" });
-    state.hasAutoScrolledToRankings = true;
+  if (els.bestTeamAiPanel) {
+    const canUseAi = visible && state.role === "host" && state.room?.status === "ended";
+    els.bestTeamAiPanel.classList.toggle("hidden", !canUseAi);
   }
+  if (!visible) return;
 
   els.rankingsTable.innerHTML = "";
   rankings.forEach(entry => {
@@ -1060,10 +1076,17 @@ function render() {
   if (heroBanner) heroBanner.classList.toggle("hidden", ready);
   
   els.roomCard.classList.toggle("hidden", !ready);
+  els.shareCard.classList.toggle("hidden", !ready);
+  els.upcomingCard.classList.toggle("hidden", !ready);
   els.auctionCard.classList.toggle("hidden", !ready);
   els.teamsCard.classList.toggle("hidden", !ready);
   els.marketWatchCard.classList.toggle("hidden", !ready);
   els.logsCard.classList.toggle("hidden", !ready);
+
+  const isEnded = state.room?.status === "ended";
+  if (els.downloadCsvBtn) {
+    els.downloadCsvBtn.classList.toggle("hidden", !isEnded);
+  }
 
   if (!ready) return;
 
@@ -1074,6 +1097,12 @@ function render() {
   const pausedTag = state.room.isPaused ? " (Paused)" : "";
   const statusLabel = (statusMap[state.room.status] || state.room.status) + pausedTag;
   els.statusText.textContent = `${statusLabel} · ${state.room.lotIndex}/${state.room.totalLots}`;
+  
+  if (els.livePulse) {
+    const isLive = state.room.status === "live";
+    els.livePulse.style.display = isLive ? "" : "none";
+    if (els.statusIcon) els.statusIcon.style.display = isLive ? "none" : "";
+  }
 
   els.hostControls.classList.toggle("hidden", state.role !== "host");
   if (els.pauseAuctionBtn) {
@@ -1203,7 +1232,6 @@ on(els.skipPlayerBtn, "click", () => {
 on(els.endAuctionBtn, "click", () => {
   const ok = window.confirm("End auction now and move all teams to Playing XI submission?");
   if (!ok) return;
-  localStorage.removeItem("auction_session");
   socket.emit("end_auction");
 });
 
@@ -1250,7 +1278,50 @@ on(els.startAuctionBtn, "click", () => {
   socket.emit("set_timer_duration", { duration: els.timerSelect.value });
   socket.emit("start_auction", { timerDuration: Number(els.timerSelect.value) });
 });
+on(els.evaluateBtn, "click", () => socket.emit("evaluate_rankings"));
 
+on(els.bestTeamAiBtn, "click", async () => {
+  if (!state.room?.rankings || !state.room.rankings.length) {
+    if (els.bestTeamAiMsg) els.bestTeamAiMsg.textContent = "No rankings available yet.";
+    return;
+  }
+
+  if (els.bestTeamAiMsg) {
+    els.bestTeamAiMsg.className = "message ok";
+    els.bestTeamAiMsg.textContent = "Evaluating best team with AI...";
+  }
+
+  try {
+    const res = await fetch("/api/analyze-rankings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rankings: state.room.rankings })
+    });
+    const data = await res.json();
+    if (data.error) {
+      if (els.bestTeamAiMsg) {
+        els.bestTeamAiMsg.className = "message";
+        els.bestTeamAiMsg.textContent = data.error;
+      }
+      return;
+    }
+
+    if (els.bestTeamAiMsg) {
+      els.bestTeamAiMsg.className = "message ok";
+      els.bestTeamAiMsg.textContent = `Best Team: ${data.bestTeam}. ${data.summary}`;
+    }
+  } catch (e) {
+    if (els.bestTeamAiMsg) {
+      els.bestTeamAiMsg.className = "message";
+      els.bestTeamAiMsg.textContent = "AI evaluation failed. Try again.";
+    }
+  }
+});
+if (els.goPlaying11Btn) {
+  on(els.goPlaying11Btn, "click", () => {
+    els.playing11Card?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
 
 on(els.impactPlayerSelect, "change", () => {
   const team = myTeam();
@@ -1309,6 +1380,55 @@ on(els.submitXIBtn, "click", () => {
     impactPlayerId: state.selectedImpact || null,
   });
 });
+
+/* ── AI Analyse ── */
+if (els.analyzeBtn) {
+  on(els.analyzeBtn, "click", async () => {
+    const team = myTeam();
+    if (!team) return;
+    if (state.selectedXI.size !== 11) {
+      setAiMessage("Submit your Playing XI first.");
+      return;
+    }
+    const xi = [...state.selectedXI].map(id => team.squad.find(p => p.id === id)).filter(Boolean);
+    if (xi.length !== 11) { setAiMessage("Could not resolve all 11 players."); return; }
+    const impactPlayer = state.selectedImpact
+      ? team.squad.find(p => p.id === state.selectedImpact) || null
+      : null;
+
+    els.analyzeBtn.disabled = true;
+    els.analyzeBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analysing…`;
+    setAiMessage("", false);
+
+    try {
+      const res = await fetch("/api/analyze-xi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamId: state.teamId,
+          teamName: team.name,
+          players: xi,
+          impactPlayer,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) { setAiMessage(data.error); }
+      else {
+        els.aiResult.classList.remove("hidden");
+        els.aiCommentary.textContent = data.commentary;
+        const cfg = teamConfig(state.teamId);
+        els.aiScoreBar.innerHTML = (data.grades || []).map((g, i) =>
+          `<span class="badge-pill" style="${i===0?`background:${cfg.primary}22;color:${cfg.primary};border-color:${cfg.primary}44`:""}">${g}</span>`
+        ).join(" ");
+      }
+    } catch (e) {
+      setAiMessage("Analysis failed. Try again.");
+    } finally {
+      els.analyzeBtn.disabled = false;
+      els.analyzeBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI`;
+    }
+  });
+}
 
 /* ══════════════════════════════════════════════════
    SOCKET STATE SYNC
@@ -1380,22 +1500,11 @@ socket.on("playing11_error", msg => {
 socket.on("room_state", roomState => {
   state.isOptimisticLoading = false; // Server has synced back
   const prevLotId = state.room?.currentLot?.id;
-  const previousStatus = state.room?.status || state.prevRoomStatus;
   state.room = roomState;
-
   // Reset skip button label when lot changes
   if (els.skipPlayerBtn && roomState.currentLot?.id !== prevLotId) {
     els.skipPlayerBtn.innerHTML = `<i class="fa-solid fa-forward-step"></i> Skip`;
   }
-
-  if (previousStatus !== state.room.status) {
-    if (state.room.status === "live") {
-      state.hasAutoScrolledToPlaying11 = false;
-      state.hasAutoScrolledToRankings = false;
-    }
-    state.prevRoomStatus = state.room.status;
-  }
-
   if (els.timerSelect && Number.isFinite(Number(roomState.timerDuration))) {
     els.timerSelect.value = String(roomState.timerDuration);
   }
@@ -1439,6 +1548,15 @@ socket.on("connect", () => {
 ══════════════════════════════════════════════════ */
 buildTeamSelector();
 
+// Toggle logs/feed visibility (minimize)
+if (els.toggleLogsBtn) {
+  els.toggleLogsBtn.addEventListener("click", () => {
+    const isMinimized = els.logsBox.classList.toggle("minimized");
+    els.toggleLogsIcon.className = isMinimized ? "fa-solid fa-plus" : "fa-solid fa-minus";
+    els.toggleLogsBtn.innerHTML = `<i class="${els.toggleLogsIcon.className}" id="toggleLogsIcon"></i> ${isMinimized ? "Expand" : "Minimize"}`;
+  });
+}
+
 // Toggle teams grid visibility
 const toggleTeamsBtn = document.getElementById("toggleTeamsBtn");
 const toggleTeamsIcon = document.getElementById("toggleTeamsIcon");
@@ -1462,21 +1580,83 @@ if (tabNew && tabJoin) {
   tabNew.addEventListener("click", () => {
     tabNew.classList.add("active");
     tabJoin.classList.remove("active");
-    tabContentNew.classList.add("active");
-    tabContentJoin.classList.remove("active");
+    if (tabContentNew) tabContentNew.classList.add("active");
+    if (tabContentJoin) tabContentJoin.classList.remove("active");
   });
   tabJoin.addEventListener("click", () => {
     tabJoin.classList.add("active");
     tabNew.classList.remove("active");
-    tabContentJoin.classList.add("active");
-    tabContentNew.classList.remove("active");
+    if (tabContentJoin) tabContentJoin.classList.add("active");
+    if (tabContentNew) tabContentNew.classList.remove("active");
   });
 }
 
-// Pre-fill room code from URL & auto-switch to Join tab
+// ── CSV Export ──
+function downloadSquadsCSV() {
+  if (!state.room || !state.room.teams) return;
+  
+  let csvContent = "Team,Player Name,Role,Nationality,Price (Cr)\n";
+  
+  state.room.teams.forEach(team => {
+    const squad = team.squad || [];
+    squad.forEach(p => {
+      const type = p.overseas ? "Overseas" : "Indian";
+      const price = (p.soldPrice || 0).toFixed(2);
+      // Escape spaces or commas if necessary
+      const playerName = `"${p.name.replace(/"/g, '""')}"`;
+      csvContent += `${team.name},${playerName},${p.role},${type},${price}\n`;
+    });
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  
+  link.setAttribute("href", url);
+  link.setAttribute("download", `IPL_Auction_Results_${timestamp}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+if (els.downloadCsvBtn) {
+  els.downloadCsvBtn.addEventListener("click", downloadSquadsCSV);
+}
+
+// Pre-fill room code ...
 const urlRoom = new URLSearchParams(window.location.search).get("room");
 if (urlRoom) {
   els.roomInput.value = urlRoom;
-  // Auto-switch to Join tab
-  if (tabJoin) tabJoin.click();
 }
+
+if (els.homeBtnArena) {
+  els.homeBtnArena.addEventListener("click", () => {
+    const ok = window.confirm("Exit to main page? Your current session will be cleared.");
+    if (!ok) return;
+    localStorage.removeItem("auction_session");
+    window.location.href = "https://ipl-auction-9avg.onrender.com/";
+  });
+}
+
+if (els.homeBtn) {
+  els.homeBtn.addEventListener("click", () => {
+    const ok = window.confirm("Exit to main page? Your current session will be cleared.");
+    if (!ok) return;
+    localStorage.removeItem("auction_session");
+    window.location.href = "https://ipl-auction-9avg.onrender.com/";
+  });
+}
+
+if (els.homeBtnHeader) {
+  els.homeBtnHeader.addEventListener("click", () => {
+    const ok = window.confirm("Exit to main page? Your current session will be cleared.");
+    if (!ok) return;
+    localStorage.removeItem("auction_session");
+    window.location.href = "https://ipl-auction-9avg.onrender.com/";
+  });
+}
+
+// Auto-switch to Join tab
+if (tabJoin) tabJoin.click();

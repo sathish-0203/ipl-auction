@@ -12,42 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 
-<body>
-  <!-- Animated background shapes -->
-  <div class="bg-shape bg-shape-1"></div>
-  <div class="bg-shape bg-shape-2"></div>
-
-  <!-- ══════ SOLD / UNSOLD OVERLAY ══════ -->
-  <div id="lotResultOverlay" class="lot-result-overlay hidden">
-    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
-    <div class="lot-result-content">
-      <div id="lotResultIcon" class="lot-result-icon">🎉</div>
-      <h1 id="lotResultTitle" class="lot-result-title">SOLD!</h1>
-      <p id="lotResultAmount" class="lot-result-amount">₹2.00 Cr</p>
-      <div id="lotResultTeam" class="lot-result-team">
-        <img id="lotResultTeamLogo" class="lot-result-team-logo" src="" alt="" />
-        <span id="lotResultTeamName"></span>
-      </div>
-      <p id="lotResultPlayer" class="lot-result-player"></p>
-    </div>
-  </div>
-
-  <main class="container">
-
-    <!-- ══════ HERO BANNER ══════ -->
-    <header class="hero-banner">
-      <div class="hero-inner">
-        <div class="hero-badge">🏏 LIVE AUCTION PLATFORM</div>
-        <h1 class="hero-title">
-          <i class="fa-solid fa-cricket-bat-ball hero-icon"></i> IPL Auction Arena
-        </h1>
-        <p class="muted-text" style="margin-top:10px; font-size:1rem;">
-          10 teams · Real-time bidding · Playing XI intelligence
-        </p>
-        <p class="hero-credit">Created by Viper</p>
-      </div>
-    </header>
-
     <!-- ══════ FEATURES GRID ══════ -->
     <section class="card features-section" id="featuresCard">
       <h2 class="features-title">Why Play IPL Auction Game?</h2>
@@ -372,6 +336,444 @@
       </div>
       <div id="logsBox" class="logs"></div>
     </section>
+
+  </main>
+
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="teams.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
+</head>
+
+<body>
+  <!-- Animated background shapes -->
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
+
+  <!-- ══════ SOLD / UNSOLD OVERLAY ══════ -->
+  <div id="lotResultOverlay" class="lot-result-overlay hidden">
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+    <div class="lot-result-content">
+      <div id="lotResultIcon" class="lot-result-icon">🎉</div>
+      <h1 id="lotResultTitle" class="lot-result-title">SOLD!</h1>
+      <p id="lotResultAmount" class="lot-result-amount">₹2.00 Cr</p>
+      <div id="lotResultTeam" class="lot-result-team">
+        <img id="lotResultTeamLogo" class="lot-result-team-logo" src="" alt="" />
+        <span id="lotResultTeamName"></span>
+      </div>
+      <p id="lotResultPlayer" class="lot-result-player"></p>
+    </div>
+  </div>
+
+  <main class="container">
+
+    <!-- ══════ HERO BANNER ══════ -->
+    <header class="hero-banner">
+      <div class="hero-inner">
+        <div class="hero-badge">🏏 LIVE AUCTION PLATFORM</div>
+        <h1 class="hero-title">
+          <i class="fa-solid fa-cricket-bat-ball hero-icon"></i> IPL Auction Arena
+        </h1>
+        <p class="muted-text hero-subtitle-dim">
+          10 teams · Real-time bidding · Playing XI intelligence
+        </p>
+      </div>
+    </header>
+
+    <!-- ══════ FEATURES GRID ══════ -->
+    <section class="card features-section" id="featuresCard">
+      <h2 class="features-title">Why Play IPL Auction Game?</h2>
+      <p class="features-subtitle">Experience the thrill of being an IPL team owner. Build your dream squad with real auction mechanics.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+          <h3>Play with Friends</h3>
+          <p>Create private rooms and invite up to 10 friends. Each person becomes an IPL franchise owner.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h3>Real-Time Bidding</h3>
+          <p>Live auction with instant updates. Place bids, counter-bid, and compete for top players.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-crown"></i></div>
+          <h3>2026 Official Player List</h3>
+          <p>Updated with the uploaded full player dataset and real base prices.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-stopwatch"></i></div>
+          <h3>Authentic Timer System</h3>
+          <p>IPL-style countdown timer adds pressure and excitement to every bid decision.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+          <h3>Works on Any Device</h3>
+          <p>Play on mobile, tablet, or desktop. No app download needed — just open and play.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+          <h3>No Sign Up Required</h3>
+          <p>Jump straight into the action. No account needed — just enter your name and start.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ JOIN / CREATE — UNIFIED ══════ -->
+    <section class="card join-section" id="teamSelectCard">
+      <div class="join-tabs" id="joinTabs">
+        <button class="join-tab active" data-tab="new" id="tabNew"><i class="fa-solid fa-bolt"></i> New Game</button>
+        <button class="join-tab" data-tab="join" id="tabJoin"><i class="fa-solid fa-right-to-bracket"></i> Join Room</button>
+      </div>
+
+      <!-- NEW GAME TAB -->
+      <div class="join-tab-content active" id="tabContentNew">
+        <label class="join-label">
+          Your Name
+          <input id="nameInput" placeholder="Enter your name" autocomplete="off" />
+        </label>
+
+        <div class="join-team-picker">
+          <label class="join-label" style="margin-bottom:8px;">Choose Your Team</label>
+          <div class="team-circle-row" id="teamSelectGrid"></div>
+        </div>
+        <p id="teamSelectMsg" class="message" style="margin-top:4px;"></p>
+        <div id="selectedTeamBadge" class="selected-team-badge hidden" style="margin-top:8px;"></div>
+
+        <button id="createBtn" class="accent create-room-btn">
+          <i class="fa-solid fa-bolt"></i> Create Room
+        </button>
+      </div>
+
+      <!-- JOIN ROOM TAB -->
+      <div class="join-tab-content" id="tabContentJoin">
+        <label class="join-label">
+          Your Name
+          <input id="nameInputJoin" placeholder="Enter your name" autocomplete="off" />
+        </label>
+        <label class="join-label">
+          Room Code
+          <input id="roomInput" placeholder="e.g. A7K9QP" autocomplete="off" style="text-transform:uppercase;" />
+        </label>
+
+        <div class="join-team-picker">
+          <label class="join-label" style="margin-bottom:8px;">Choose Your Team</label>
+          <div class="team-circle-row" id="teamSelectGridJoin"></div>
+        </div>
+
+        <button id="joinBtn" class="accent create-room-btn" style="background:rgba(255,255,255,0.1);color:var(--ink);border:1px solid var(--accent);">
+          <i class="fa-solid fa-right-to-bracket"></i> Join Room
+        </button>
+      </div>
+
+      <p id="joinMessage" class="message" style="text-align:center;"></p>
+    </section>
+
+    <!-- Hidden dummy joinCard for app.js hide/show logic -->
+    <div id="joinCard" class="hidden"></div>
+
+    <!-- ══════ ROOM INFO ══════ -->
+    <section class="card hidden room-card-highlight" id="roomCard">
+      <div class="row between" style="flex-wrap:wrap; gap:16px;">
+        <div>
+          <div class="dashboard-title">
+            <i class="fa-solid fa-users" style="color:var(--accent);margin-right:8px;"></i>
+            Auction Arena
+            <span id="roomCodeText" class="room-id-badge"></span>
+          </div>
+          <div class="arena-header-row">
+            <button id="homeBtnHeader" class="btn btn-outline home-btn-header" title="Return to Main Page">
+              <i class="fa-solid fa-house"></i>
+            </button>
+            <span id="identityText" class="badge-pill badge-pill-dim"></span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div id="myPurseChip" class="purse-chip" style="display:none;">
+            <i class="fa-solid fa-wallet"></i>
+            Purse: <strong id="myPurseText">₹120 Cr</strong>
+          </div>
+          <span id="statusChip" class="status-chip">
+            <span class="live-pulse" id="livePulse" style="display:none;"></span>
+            <i class="fa-solid fa-satellite-dish" id="statusIcon"></i>
+            <span id="statusText">Lobby</span>
+          </span>
+        </div>
+      </div>
+      <div id="postAuctionActions" class="row hidden post-auction-row">
+        <button id="goPlaying11Btn" class="accent">
+          <i class="fa-solid fa-clipboard-list"></i> Make Playing XI
+        </button>
+        <span class="small">After auction, submit 11 players to analyze and rank teams.</span>
+      </div>
+    </section>
+
+    <!-- ══════ UPCOMING PLAYERS (TOP) ══════ -->
+    <section class="card hidden" id="upcomingCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Upcoming Players</h2>
+      </div>
+      <div id="upcomingListTop" class="market-list upcoming-horizontal"></div>
+    </section>
+
+    <!-- ══════ AUCTION DESK ══════ -->
+    <section class="card hidden" id="auctionCard">
+      <div class="row between" style="flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;color:#fff;">
+          <i class="fa-solid fa-gavel" style="color:var(--accent);margin-right:8px;"></i>Auction Desk
+        </h2>
+        <div id="auctionProgressText" class="badge-pill" style="font-size:0.8rem;">0 / 0 players</div>
+      </div>
+
+      <!-- Host Controls (only visible to host) -->
+      <div id="hostControls" class="hidden" style="margin-bottom:16px;">
+        <div class="row" style="gap:10px;flex-wrap:wrap;padding:16px;background:rgba(245,166,35,0.06);border-radius:14px;border:1px solid rgba(245,166,35,0.15);">
+          <button id="startAuctionBtn" class="accent">
+            <i class="fa-solid fa-play"></i> Start Auction
+          </button>
+          <button id="pauseAuctionBtn" class="btn-unsold">
+            <i class="fa-solid fa-pause"></i> Pause Auction
+          </button>
+          <button id="endAuctionBtn" class="btn-sold">
+            <i class="fa-solid fa-flag-checkered"></i> End Auction
+          </button>
+          <button id="evaluateBtn" class="btn-eval">
+            <i class="fa-solid fa-chart-bar"></i> Evaluate Rankings
+          </button>
+          <div class="row" style="gap:8px; margin-left:auto;">
+            <select id="timerSelect" style="width:90px;padding:8px 10px;" aria-label="Auction timer seconds" title="Auction timer seconds">
+              <option value="5">5s</option>
+              <option value="10" selected>10s</option>
+              <option value="15">15s</option>
+              <option value="20">20s</option>
+              <option value="30">30s</option>
+              <option value="45">45s</option>
+              <option value="60">60s</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player LOT box -->
+      <div class="lot-box" id="lotBox" style="position:relative;">
+        <!-- Timer ring -->
+        <div class="timer-container hidden" id="timerContainer">
+          <svg class="timer-ring" viewBox="0 0 100 100">
+            <circle class="timer-ring-bg" cx="50" cy="50" r="45"/>
+            <circle class="timer-ring-fill" id="timerRingFill" cx="50" cy="50" r="45"/>
+          </svg>
+          <span class="timer-text" id="timerText">10</span>
+        </div>
+
+        <div class="lot-header">
+          <h3 id="playerName">
+            <i class="fa-solid fa-person-running player-name-icon"></i> No player on the lot
+          </h3>
+        </div>
+
+        <p id="playerMeta" class="player-meta-small"></p>
+
+        <div class="lot-stats">
+          <div class="stat-box accent-stat">
+            <div class="stat-label">Base Price</div>
+            <div class="stat-value" id="basePriceText">—</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Nationality</div>
+            <div id="playerTypeText" class="stat-value stat-value-role">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Role</div>
+            <div id="playerRoleText" class="stat-value stat-value-role">—</div>
+          </div>
+          <div class="stat-box" style="grid-column: span 1;">
+            <div class="stat-label">Highest Bid</div>
+            <div id="highestBidText" class="stat-value stat-value-large">—</div>
+          </div>
+        </div>
+        <div id="arenaHomeBtnContainer" class="hidden arena-home-container">
+          <button id="homeBtnArena" class="btn btn-outline home-btn-arena">
+            <i class="fa-solid fa-house"></i> Go to Home
+          </button>
+        </div>
+      </div>
+
+      <!-- Bid Controls (shown for team owners when live) -->
+      <div class="card bid-panel hidden" id="bidCard" style="margin-top:16px;">
+        <div class="row between bid-title-row">
+          <h3 class="bid-title"><i class="fa-solid fa-hand-holding-dollar"></i> Place Your Bid</h3>
+          <button id="skipPlayerBtn" class="btn-eval skip-btn-small" title="Vote to skip this player">
+            <i class="fa-solid fa-forward-step"></i> Skip
+          </button>
+        </div>
+        <div class="row bid-bar" style="gap:12px;flex-wrap:wrap;">
+          <button id="quickBidBtn" class="accent giant-bid-btn">
+            <span><i class="fa-solid fa-bolt"></i> Quick Bid</span>
+            <span id="quickBidAmount">₹—</span>
+          </button>
+        </div>
+        <p id="bidMessage" class="message"></p>
+      </div>
+    </section>
+
+    <!-- ══════ TEAMS & SQUADS ══════ -->
+    <section class="card hidden" id="teamsCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-shield-halved"></i> Teams &amp; Squads</h2>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="badge-pill" id="teamsLiveChip"></span>
+          <button id="toggleTeamsBtn" style="padding:6px 14px;font-size:0.8rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
+            <i class="fa-solid fa-chevron-up" id="toggleTeamsIcon"></i> Hide
+          </button>
+        </div>
+      </div>
+      <div id="teamsGrid" class="team-squads-grid"></div>
+    </section>
+
+    <section class="card hidden" id="marketWatchCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-list-check"></i> Auction Tracker</h2>
+      </div>
+      <div class="market-watch-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        <div class="market-watch-col">
+          <h3>Sold Players</h3>
+          <div id="soldList" class="market-list"></div>
+        </div>
+        <div class="market-watch-col">
+          <h3>Unsold Players</h3>
+          <div id="unsoldList" class="market-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ PLAYING XI ══════ -->
+    <section class="card hidden" id="playing11Card">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-people-group"></i> Submit Playing XI</h2>
+        <div class="xi-counters">
+          <span id="xiCountChip" class="counter-chip">0 / 11 selected</span>
+          <span id="xiOverseasChip" class="counter-chip overseas">✈️ 0 / 4 overseas</span>
+          <span id="impactPlayerChip" class="counter-chip">Impact: Not selected</span>
+        </div>
+      </div>
+      <p class="muted-text">
+        <i class="fa-solid fa-circle-exclamation" style="color:var(--accent);"></i>
+        Select exactly 11 players from your squad, then choose 1 optional Impact Player from the remaining bench. Max 4 overseas across XI + Impact.
+      </p>
+      <div class="role-legend">
+        <span class="role-dot bat">BAT</span>
+        <span class="role-dot bowl">BOWL</span>
+        <span class="role-dot ar">AR</span>
+        <span class="role-dot wk">WK</span>
+        <span class="role-dot os">✈️ OS</span>
+      </div>
+      <div id="playing11List" class="player-pills"></div>
+      <div class="impact-picker">
+        <label for="impactPlayerSelect" class="join-label impact-label">Impact Player (optional)</label>
+        <div class="row impact-row">
+          <select id="impactPlayerSelect" class="impact-select">
+            <option value="">Select Impact Player</option>
+          </select>
+          <button id="clearImpactBtn" type="button" class="btn-unsold">Clear</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:16px;gap:10px;">
+        <button id="submitXIBtn" class="accent">
+          <i class="fa-solid fa-paper-plane"></i> Submit Playing XI
+        </button>
+      </div>
+      <p id="playing11Message" class="message"></p>
+    </section>
+
+    <!-- ══════ AI ANALYSIS ══════ -->
+    <section class="card hidden" id="aiCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-robot"></i> AI Squad Analysis</h2>
+      </div>
+      <div id="aiSquadPreview" style="margin-bottom:14px;"></div>
+      <button id="analyzeBtn" class="accent">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My XI
+      </button>
+      <div id="aiResult" class="hidden" style="margin-top:16px;">
+        <div id="aiScoreBar" class="ai-score-bar"></div>
+        <div id="aiCommentary" style="font-size:0.9rem;color:var(--ink-dim);line-height:1.7;white-space:pre-wrap;background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);"></div>
+      </div>
+      <p id="aiMessage" class="message"></p>
+    </section>
+
+    <!-- ══════ RANKINGS ══════ -->
+    <section class="card hidden" id="rankingsCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-trophy"></i> Final Rankings</h2>
+      </div>
+      <div id="rankingsTable"></div>
+      <div id="bestTeamAiPanel" class="hidden" style="margin-top:14px;">
+        <button id="bestTeamAiBtn" class="accent">
+          <i class="fa-solid fa-brain"></i> AI Evaluate Best Team
+        </button>
+        <p id="bestTeamAiMsg" class="message" style="margin-top:8px;"></p>
+      </div>
+
+      <div class="row final-home-row">
+        <button id="downloadCsvBtnFinal" class="btn btn-outline hidden">
+          <i class="fa-solid fa-file-csv"></i> Download CSV
+        </button>
+        <button id="homeBtn" class="btn btn-outline">
+          <i class="fa-solid fa-house"></i> Go to Home
+        </button>
+      </div>
+    </section>
+
+    <!-- ══════ LIVE FEED ══════ -->
+    <section class="card hidden" id="logsCard">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-bolt"></i> Live Auction Feed</h2>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="live-dot badge-pill">🔴 Live</span>
+          <button id="toggleLogsBtn" style="padding:6px 12px;font-size:0.75rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);">
+            <i class="fa-solid fa-minus" id="toggleLogsIcon"></i> Minimize
+          </button>
+        </div>
+      </div>
+      <div id="logsBox" class="logs"></div>
+    </section>
+
+    <!-- ══════ SHARE SECTION (BOTTOM) ══════ -->
+    <section class="card hidden share-section-bot" id="shareCard">
+      <div class="section-header">
+        <h3><i class="fa-solid fa-share-nodes arena-title-icon"></i> Invite Friends to Join</h3>
+      </div>
+      <div class="row">
+        <p class="share-label-small">Share Link:</p>
+        <input id="shareLinkInput" readonly title="Share room link" class="share-link-input" />
+        <button id="copyLinkBtn" class="share-copy-btn">
+          <i class="fa-solid fa-copy"></i> Copy
+        </button>
+      </div>
+      <div id="shareApps" class="share-apps-row hidden">
+        <span class="small">More Ways:</span>
+        <a id="shareWhatsapp" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
+        <a id="shareTelegram" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-telegram"></i> Telegram
+        </a>
+        <a id="shareTwitter" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-x-twitter"></i> X
+        </a>
+        <a id="shareEmail" class="share-app-btn" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-envelope"></i> Email
+        </a>
+      </div>
+    </section>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>&copy; <span id="currentYear"></span> Created with ❤️ by Viper and VK.</p>
+      <p class="footer-tagline">Building the ultimate 2026 Auction experience.</p>
+    </div>
+  </footer>
 
   </main>
 
