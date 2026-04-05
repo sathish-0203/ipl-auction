@@ -766,7 +766,8 @@ function renderTeams() {
   const PURSE_START = 120;
 
   els.teamsGrid.innerHTML = "";
-  state.room.teams.forEach(team => {
+  const activeTeams = state.room.teams.filter((team) => team.ownerName && team.ownerName !== "Vacant");
+  activeTeams.forEach(team => {
     const cfg = teamConfig(team.id);
     const spent = PURSE_START - team.purse;
     const pct = Math.max(0, Math.min(100, (team.purse / PURSE_START) * 100));
@@ -873,10 +874,6 @@ function renderPlaying11Selection() {
     state.selectedImpact = null;
   }
 
-  const overseasSelected = [...state.selectedXI].filter(id => sortedSquad.find(pl => pl.id === id)?.overseas).length;
-  const impactPlayer = state.selectedImpact ? squad.find(p => p.id === state.selectedImpact) : null;
-  const totalOverseasWithImpact = overseasSelected + (impactPlayer?.overseas ? 1 : 0);
-
   // Sort squad: selected players first, in selection order, then unselected
   const sortedSquad = [...squad].sort((a, b) => {
     const aSelected = state.selectedXI.has(a.id);
@@ -890,6 +887,10 @@ function renderPlaying11Selection() {
     if (bSelected) return 1;
     return 0;
   });
+
+  const overseasSelected = [...state.selectedXI].filter(id => sortedSquad.find(pl => pl.id === id)?.overseas).length;
+  const impactPlayer = state.selectedImpact ? squad.find(p => p.id === state.selectedImpact) : null;
+  const totalOverseasWithImpact = overseasSelected + (impactPlayer?.overseas ? 1 : 0);
 
   sortedSquad.forEach((player, index) => {
     const isSelected  = state.selectedXI.has(player.id);
