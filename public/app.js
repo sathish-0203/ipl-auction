@@ -1636,7 +1636,7 @@ if (els.homeBtnArena) {
     const ok = window.confirm("Exit to main page? Your current session will be cleared.");
     if (!ok) return;
     localStorage.removeItem("auction_session");
-    window.location.href = "https://ipl-auction-9avg.onrender.com/";
+    window.location.href = "https://auction-room-56h3.onrender.com/";
   });
 }
 
@@ -1645,7 +1645,7 @@ if (els.homeBtn) {
     const ok = window.confirm("Exit to main page? Your current session will be cleared.");
     if (!ok) return;
     localStorage.removeItem("auction_session");
-    window.location.href = "https://ipl-auction-9avg.onrender.com/";
+    window.location.href = "https://auction-room-56h3.onrender.com/";
   });
 }
 
@@ -1654,7 +1654,7 @@ if (els.homeBtnHeader) {
     const ok = window.confirm("Exit to main page? Your current session will be cleared.");
     if (!ok) return;
     localStorage.removeItem("auction_session");
-    window.location.href = "https://ipl-auction-9avg.onrender.com/";
+    window.location.href = "https://auction-room-56h3.onrender.com/";
   });
 }
 
